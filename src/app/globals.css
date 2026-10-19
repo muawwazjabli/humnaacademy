@@ -1,0 +1,71 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    --brand-deep: #123F32;
+    --brand-emerald: #16845B;
+    --brand-cream: #F6F0E4;
+    --brand-gold: #C5A15A;
+  }
+
+  body {
+    @apply bg-[#FCFAF6] text-gray-900 antialiased selection:bg-brand-gold/30 selection:text-brand-deep;
+  }
+}
+
+/* RTL Typography adjustments */
+[dir="rtl"] {
+  text-align: right;
+  letter-spacing: normal;
+}
+
+[dir="rtl"] .font-urdu {
+  line-height: 1.8;
+}
+
+/* Subtle Geometric Star Pattern */
+.bg-islamic-stars {
+  background-color: #123F32;
+  background-image: radial-gradient(rgba(197, 161, 90, 0.15) 1px, transparent 1px),
+    radial-gradient(rgba(197, 161, 90, 0.15) 1px, #123F32 1px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}
+
+.bg-islamic-cream-pattern {
+  background-color: #F8F4EC;
+  background-image: radial-gradient(rgba(18, 63, 50, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1ede4;
+}
+::-webkit-scrollbar-thumb {
+  background: #C5A15A;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #16845B;
+}
