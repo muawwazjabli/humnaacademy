@@ -47,7 +47,7 @@ export const Logo: React.FC<LogoProps> = ({ lightMode = false, className = "" })
         <div className="flex items-center gap-1.5">
           <span
             className={`font-serif tracking-tight font-bold text-xl leading-none transition-colors ${
-              lightMode ? "text-white" : "text-brand-deep group-hover:text-brand-emerald"
+              lightMode ? "text-white" : "text-brand-deep group-hover:text-brand-emerald dark:text-white"
             }`}
           >
             Humna
@@ -58,7 +58,7 @@ export const Logo: React.FC<LogoProps> = ({ lightMode = false, className = "" })
         </div>
         <span
           className={`text-[10px] tracking-widest uppercase font-medium mt-1 ${
-            lightMode ? "text-brand-cream/80" : "text-gray-500"
+            lightMode ? "text-brand-cream/80" : "text-gray-500 dark:text-gray-300"
           }`}
         >
           Online Quran Academy
