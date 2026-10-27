@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TrialBookingPayload } from "@/types";
+import { saveTrialBookingToFirebase, isFirebaseConfigured } from "@/lib/firebase";
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,69 +42,82 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if Supabase or database credentials are configured
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-
     const referenceId = `HA-${Date.now().toString().slice(-6)}`;
     let isPersistedToDatabase = false;
+    let databaseType = "none";
 
-    if (supabaseUrl && supabaseKey) {
-      try {
-        // Dynamic fetch to Supabase REST API without bundling heavy SDK
-        const response = await fetch(`${supabaseUrl}/rest/v1/trial_requests`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": supabaseKey,
-            "Authorization": `Bearer ${supabaseKey}`,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify({
-            reference_id: referenceId,
-            full_name: data.fullName,
-            age_group: data.ageGroup,
-            parent_name: data.parentName || null,
-            email: data.email || null,
-            whatsapp_number: data.whatsappNumber,
-            country: data.country || "Not specified",
-            preferred_course: data.preferredCourse,
-            reading_level: data.readingLevel || "Beginner",
-            preferred_teacher: data.preferredTeacher || "no_preference",
-            preferred_language: data.preferredLanguage || "English",
-            preferred_days: data.preferredDays || [],
-            preferred_time: data.preferredTime || "Flexible",
-            time_zone: data.timeZone,
-            additional_message: data.additionalMessage || null,
-            created_at: new Date().toISOString()
-          })
-        });
-
-        if (response.ok) {
-          isPersistedToDatabase = true;
-        } else {
-          console.warn("Supabase API returned non-OK status. Falling back to structured log response.");
-        }
-      } catch (dbErr) {
-        console.warn("Could not reach Supabase endpoint:", dbErr);
+    // 1. First priority: Google Firebase Firestore
+    if (isFirebaseConfigured()) {
+      const fbResult = await saveTrialBookingToFirebase(data, referenceId);
+      if (fbResult.success) {
+        isPersistedToDatabase = true;
+        databaseType = "firebase";
+      } else {
+        console.warn("Firebase save warning:", fbResult.error);
       }
     }
 
-    // Server-side safe payload preparation
+    // 2. Secondary fallback: Supabase (if configured and Firebase not active)
+    if (!isPersistedToDatabase) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const response = await fetch(`${supabaseUrl}/rest/v1/trial_requests`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": supabaseKey,
+              "Authorization": `Bearer ${supabaseKey}`,
+              "Prefer": "return=minimal",
+            },
+            body: JSON.stringify({
+              reference_id: referenceId,
+              full_name: data.fullName,
+              age_group: data.ageGroup,
+              parent_name: data.parentName || null,
+              email: data.email || null,
+              whatsapp_number: data.whatsappNumber,
+              country: data.country || "Not specified",
+              preferred_course: data.preferredCourse,
+              reading_level: data.readingLevel || "Beginner",
+              preferred_teacher: data.preferredTeacher || "no_preference",
+              preferred_language: data.preferredLanguage || "English",
+              preferred_days: data.preferredDays || [],
+              preferred_time: data.preferredTime || "Flexible",
+              time_zone: data.timeZone,
+              additional_message: data.additionalMessage || null,
+              created_at: new Date().toISOString(),
+            }),
+          });
+
+          if (response.ok) {
+            isPersistedToDatabase = true;
+            databaseType = "supabase";
+          }
+        } catch (dbErr) {
+          console.warn("Could not reach Supabase endpoint:", dbErr);
+        }
+      }
+    }
+
+    // Server-side safe payload response
     return NextResponse.json({
       success: true,
       referenceId,
       isPersistedToDatabase,
+      databaseType,
       mode: isPersistedToDatabase ? "production" : "demo",
       message: isPersistedToDatabase
-        ? "Your trial request has been securely recorded in our database. Our academic coordinator will contact you via WhatsApp."
+        ? `Your trial request has been securely recorded in our ${databaseType === "firebase" ? "Firebase" : "cloud"} database. Our academic coordinator will contact you via WhatsApp.`
         : "Demo / Standalone Mode Active: Your trial request has been validated and prepared. You can immediately forward the prefilled details to the academy via official WhatsApp.",
       summary: {
         name: data.fullName,
         course: data.preferredCourse,
         timeZone: data.timeZone,
-        whatsapp: data.whatsappNumber
-      }
+        whatsapp: data.whatsappNumber,
+      },
     });
   } catch (error) {
     console.error("Trial booking API error:", error);
@@ -113,3 +127,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

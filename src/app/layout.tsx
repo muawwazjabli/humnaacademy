@@ -55,15 +55,38 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="min-h-screen flex flex-col font-sans">
-        <LanguageProvider>
-          <AnnouncementBar />
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-          <WhatsAppFloatingButton />
-        </LanguageProvider>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('humna_theme');
+                  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (saved === 'dark' || (!saved && prefersDark)) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col font-sans transition-colors duration-200">
+        <ThemeProvider>
+          <LanguageProvider>
+            <AnnouncementBar />
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+            <WhatsAppFloatingButton />
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
