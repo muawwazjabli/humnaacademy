@@ -43,6 +43,11 @@ export const metadata: Metadata = {
     description:
       "Learn Quran online with personalized lessons in Nazra, Tajweed, and Hifz. Free trial available.",
   },
+  icons: {
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
   robots: {
     index: true,
     follow: true,

@@ -27,6 +27,7 @@ import { FAQS } from "@/data/faqs";
 import { CourseCard } from "@/components/CourseCard";
 import { TeacherCard } from "@/components/TeacherCard";
 import { PricingCard } from "@/components/PricingCard";
+import { HeroSlider } from "@/components/HeroSlider";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
 
@@ -159,7 +160,12 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="space-y-24 pb-20">
+    <div className="space-y-16 sm:space-y-20 pb-20">
+      {/* ===================== TOP HERO BANNER SLIDER ===================== */}
+      <section className="pt-2 sm:pt-4">
+        <HeroSlider />
+      </section>
+
       {/* ===================== HERO SECTION ===================== */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#123F32] via-[#10382C] to-[#0A261E] text-white pt-16 pb-24 lg:pt-24 lg:pb-32">
         {/* Subtle Islamic Stars Background Pattern */}
