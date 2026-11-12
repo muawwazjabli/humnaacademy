@@ -15,7 +15,6 @@ import {
   Sparkles
 } from "lucide-react";
 import {
-  PRICING_PLANS,
   PRICING_CURRENCIES,
   PRICING_POLICIES,
   SupportedCurrency
@@ -23,10 +22,14 @@ import {
 import { PricingCard } from "@/components/PricingCard";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePublicData } from "@/components/PublicDataContext";
 
 export default function PricingPage() {
   const { t } = useLanguage();
-  const [currency, setCurrency] = useState<SupportedCurrency>("USD");
+  const { pricingPlans, settings } = usePublicData();
+  const [currency, setCurrency] = useState<SupportedCurrency>(
+    (settings?.defaultCurrency as SupportedCurrency) || "USD"
+  );
 
   return (
     <div className="space-y-16 py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,7 +68,7 @@ export default function PricingPage() {
 
       {/* Pricing Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {PRICING_PLANS.map((plan) => (
+        {pricingPlans.map((plan) => (
           <PricingCard key={plan.id} plan={plan} currency={currency} />
         ))}
       </div>

@@ -12,16 +12,17 @@ import {
   BookOpen,
   Filter,
 } from "lucide-react";
-import { TEACHER_PROFILES } from "@/data/teachers";
 import { TeacherCard } from "@/components/TeacherCard";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePublicData } from "@/components/PublicDataContext";
 
 export default function TeachersPage() {
   const { t } = useLanguage();
+  const { teachers } = usePublicData();
   const [filterGender, setFilterGender] = useState<string>("All");
 
-  const filteredTeachers = TEACHER_PROFILES.filter((tProfile) => {
+  const filteredTeachers = teachers.filter((tProfile) => {
     if (filterGender === "All") return true;
     return tProfile.gender === filterGender;
   });

@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { HelpCircle, CheckCircle2, AlertCircle, MessageCircle, Calendar } from "lucide-react";
-import { FAQS } from "@/data/faqs";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePublicData } from "@/components/PublicDataContext";
 
 export default function FAQPage() {
   const { t } = useLanguage();
+  const { faqs } = usePublicData();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const categories = [
@@ -22,8 +23,8 @@ export default function FAQPage() {
 
   const filteredFaqs =
     selectedCategory === "All"
-      ? FAQS
-      : FAQS.filter((f) => f.category === selectedCategory);
+      ? faqs
+      : faqs.filter((f) => f.category === selectedCategory);
 
   return (
     <div className="space-y-12 py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,7 +72,7 @@ export default function FAQPage() {
               <div className="flex items-start gap-3">
                 <HelpCircle className="w-5 h-5 text-brand-gold shrink-0 mt-0.5" />
                 <h3 className="font-serif font-bold text-base sm:text-lg text-gray-900 leading-snug">
-                  {faq.question}
+                  {t(faq.question, faq.questionUrdu || faq.question)}
                 </h3>
               </div>
 
@@ -87,7 +88,7 @@ export default function FAQPage() {
             </div>
 
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-8">
-              {faq.answer}
+              {t(faq.answer, faq.answerUrdu || faq.answer)}
             </p>
           </div>
         ))}

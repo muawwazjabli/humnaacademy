@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { usePublicData } from "./PublicDataContext";
 
 interface LogoProps {
   lightMode?: boolean;
@@ -15,20 +17,26 @@ export const Logo: React.FC<LogoProps> = ({
   showText = true,
   size = "md",
 }) => {
+  const { settings } = usePublicData();
   const dimension = size === "sm" ? 38 : size === "lg" ? 56 : 46;
+  const logoSrc = settings?.logoUrl || "/logo.jpg";
+  const academyName = settings?.academyName || "Humna Academy";
+  const parts = academyName.split(" ");
+  const firstWord = parts[0] || "Humna";
+  const restWords = parts.slice(1).join(" ") || "Academy";
 
   return (
     <Link href="/" className={`inline-flex items-center gap-3 group ${className}`}>
       {/* Official Academy Logo Image */}
-      <div className="relative overflow-hidden rounded-xl ring-2 ring-brand-gold/40 group-hover:ring-brand-gold shadow-md transition-all shrink-0 bg-white flex items-center justify-center">
-        <Image
-          src="/logo.jpg"
-          alt="Humna Academy Logo"
-          width={dimension}
-          height={dimension}
-          className="object-cover rounded-xl transform group-hover:scale-105 transition-transform duration-300"
-          style={{ width: dimension, height: dimension }}
-          priority
+      <div
+        className="relative overflow-hidden rounded-xl ring-2 ring-brand-gold/40 group-hover:ring-brand-gold shadow-md transition-all shrink-0 bg-white flex items-center justify-center"
+        style={{ width: dimension, height: dimension }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logoSrc}
+          alt={`${academyName} Logo`}
+          className="object-cover rounded-xl w-full h-full transform group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
@@ -42,10 +50,10 @@ export const Logo: React.FC<LogoProps> = ({
                   : "text-brand-deep group-hover:text-brand-emerald dark:text-white"
               }`}
             >
-              Humna
+              {firstWord}
             </span>
             <span className="font-sans font-semibold text-xl leading-none text-brand-gold">
-              Academy
+              {restWords}
             </span>
           </div>
           <span
@@ -53,7 +61,7 @@ export const Logo: React.FC<LogoProps> = ({
               lightMode ? "text-brand-cream/80" : "text-gray-500 dark:text-gray-300"
             }`}
           >
-            Online Quran Academy
+            {settings?.tagline || "Online Quran Academy"}
           </span>
         </div>
       )}

@@ -1,0 +1,125 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Check if the signed-in user exists in admins collection and is active
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function adminDoc() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isActiveAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        adminDoc().data.active == true;
+    }
+
+    function isSuperAdmin() {
+      return isActiveAdmin() && adminDoc().data.role == 'super_admin';
+    }
+
+    function isAdminOrSuper() {
+      return isActiveAdmin() &&
+        (adminDoc().data.role == 'super_admin' || adminDoc().data.role == 'admin');
+    }
+
+    function isEditorOrAbove() {
+      return isActiveAdmin() &&
+        (adminDoc().data.role == 'super_admin' ||
+         adminDoc().data.role == 'admin' ||
+         adminDoc().data.role == 'editor');
+    }
+
+    // 1. Admin Users Collection — Strictly controlled by Super Admin
+    // An admin can read their own profile to validate login; never modify their own role or permissions.
+    match /admins/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isSuperAdmin());
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // 2. Public Website Catalog Collections (Read published only; Write by authorized Admin)
+    match /courses/{docId} {
+      allow read: if resource.data.status != 'draft' || isActiveAdmin();
+      allow create, update, delete: if isAdminOrSuper();
+    }
+
+    match /teachers/{docId} {
+      allow read: if (resource.data.status == 'published' && resource.data.active == true) || isActiveAdmin();
+      allow create, update, delete: if isAdminOrSuper();
+    }
+
+    match /pricingPlans/{docId} {
+      allow read: if resource.data.status != 'draft' || isActiveAdmin();
+      allow create, update, delete: if isAdminOrSuper();
+    }
+
+    match /blogs/{docId} {
+      allow read: if resource.data.status != 'draft' || isActiveAdmin();
+      allow create, update: if isEditorOrAbove();
+      allow delete: if isAdminOrSuper();
+    }
+
+    match /faqs/{docId} {
+      allow read: if resource.data.status != 'draft' || isActiveAdmin();
+      allow create, update, delete: if isEditorOrAbove();
+    }
+
+    match /testimonials/{docId} {
+      allow read: if (resource.data.status == 'published' && resource.data.approvalStatus == 'approved') || isActiveAdmin();
+      allow create, update, delete: if isEditorOrAbove();
+    }
+
+    match /gallery/{docId} {
+      allow read: if resource.data.status == 'published' || isActiveAdmin();
+      allow create, update, delete: if isEditorOrAbove();
+    }
+
+    match /websiteContent/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isEditorOrAbove();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // 3. Private Student Records — Authorized Staff Only
+    match /students/{studentId} {
+      allow read, write: if isAdminOrSuper();
+    }
+
+    // 4. Trial Requests — Public Create Only (with required field validation); Private Read/Manage
+    match /trial_requests/{docId} {
+      allow create: if request.resource.data.fullName is string
+        && request.resource.data.fullName.size() >= 2
+        && request.resource.data.whatsappNumber is string
+        && request.resource.data.whatsappNumber.size() >= 7;
+      allow read, update, delete: if isAdminOrSuper();
+    }
+
+    // 5. Contact Messages — Public Create Only (with validation); Private Read/Manage
+    match /contactMessages/{docId} {
+      allow create: if request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 5;
+      allow read, update, delete: if isAdminOrSuper();
+    }
+
+    // 6. Notifications & Activity Logs — Admin Internal Only
+    match /notifications/{docId} {
+      allow create: if true; // Created on new form submissions
+      allow read, update, delete: if isActiveAdmin();
+    }
+
+    match /activityLogs/{docId} {
+      allow read: if isActiveAdmin();
+      allow create: if isActiveAdmin();
+      allow update, delete: if false; // Immutable audit trail
+    }
+  }
+}

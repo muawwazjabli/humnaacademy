@@ -3,13 +3,14 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Search, Filter, BookOpen, Sparkles, Calendar, MessageCircle } from "lucide-react";
-import { COURSES } from "@/data/courses";
 import { CourseCard } from "@/components/CourseCard";
 import { buildWhatsAppLink } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePublicData } from "@/components/PublicDataContext";
 
 export default function CoursesPage() {
   const { t } = useLanguage();
+  const { courses } = usePublicData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedLevel, setSelectedLevel] = useState<string>("All");
@@ -17,6 +18,7 @@ export default function CoursesPage() {
   const categories = [
     "All",
     "Foundation",
+    "Recitation & Tajweed",
     "Recitation & Rules",
     "Memorization",
     "Advanced Studies",
@@ -25,7 +27,7 @@ export default function CoursesPage() {
 
   const levels = ["All", "Beginner", "Intermediate", "Advanced", "All Levels"];
 
-  const filtered = COURSES.filter((course) => {
+  const filtered = courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.titleUrdu.includes(searchTerm) ||

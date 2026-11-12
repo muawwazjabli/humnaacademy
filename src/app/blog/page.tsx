@@ -3,29 +3,26 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Search, BookOpen, Clock, User, ArrowRight, AlertCircle, Sparkles } from "lucide-react";
-import { BLOG_POSTS } from "@/data/blog";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePublicData } from "@/components/PublicDataContext";
 
 export default function BlogListingPage() {
   const { t, language } = useLanguage();
+  const { blogs } = usePublicData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const categories = [
     "All",
-    "Beginner Guide",
-    "Tajweed & Recitation",
-    "Hifz Guide",
-    "Parenting & Education",
-    "Supplications & Adhkar",
-    "Foundation & Nazra"
+    ...Array.from(new Set(blogs.map((b) => b.category).filter(Boolean))),
   ];
 
-  const filteredPosts = BLOG_POSTS.filter((post) => {
+  const filteredPosts = blogs.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (post.urduTitle || "").includes(searchTerm) ||
       post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      (post.tags || []).some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesCategory =
       selectedCategory === "All" || post.category === selectedCategory;

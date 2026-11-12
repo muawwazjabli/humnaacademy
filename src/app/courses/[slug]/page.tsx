@@ -15,13 +15,15 @@ import {
   GraduationCap
 } from "lucide-react";
 import { COURSES } from "@/data/courses";
+import { fetchPublicSiteBundle } from "@/lib/public-data";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { Metadata } from "next";
 
-export async function generateStaticParams() {
-  return COURSES.map((course) => ({
-    slug: course.slug,
-  }));
+export const dynamic = "force-dynamic";
+
+async function findCourse(slug: string) {
+  const bundle = await fetchPublicSiteBundle();
+  return bundle.courses.find((c) => c.slug === slug) || COURSES.find((c) => c.slug === slug);
 }
 
 export async function generateMetadata({
@@ -29,7 +31,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const course = COURSES.find((c) => c.slug === params.slug);
+  const course = await findCourse(params.slug);
   if (!course) {
     return { title: "Course Not Found | Humna Academy" };
   }
@@ -43,12 +45,12 @@ export async function generateMetadata({
   };
 }
 
-export default function CourseDetailPage({
+export default async function CourseDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const course = COURSES.find((c) => c.slug === params.slug);
+  const course = await findCourse(params.slug);
 
   if (!course) {
     notFound();

@@ -5,11 +5,15 @@ import Link from "next/link";
 import { Phone, MessageCircle, ShieldCheck, ExternalLink, Heart } from "lucide-react";
 import { Logo } from "./Logo";
 import { ACADEMY_CONFIG } from "@/lib/constants";
-import { COURSES } from "@/data/courses";
 import { useLanguage } from "./LanguageContext";
+import { usePublicData } from "./PublicDataContext";
 
 export const Footer: React.FC = () => {
   const { t } = useLanguage();
+  const { courses, settings } = usePublicData();
+  const social = settings?.social || ACADEMY_CONFIG.social;
+  const whatsappRaw = settings?.whatsappNumber || ACADEMY_CONFIG.whatsappRaw;
+  const phoneDisplay = settings?.phoneDisplay || ACADEMY_CONFIG.phone;
 
   return (
     <footer className="bg-brand-deep text-brand-cream border-t border-brand-gold/20 pt-16 pb-8">
@@ -20,8 +24,10 @@ export const Footer: React.FC = () => {
             <Logo lightMode={true} />
             <p className="text-sm text-brand-cream/80 max-w-sm leading-relaxed mt-4">
               {t(
-                "Humna Academy is an online Quran and Islamic education academy offering one-to-one personalized learning in Quran Reading (Nazra), Tajweed, Hifz, Tafseer, and Arabic for children and adults worldwide.",
-                "حُمنہ اکیڈمی ایک آن لائن قرآن و اسلامی تعلیمی اکیڈمی ہے جو دنیا بھر میں بچوں اور بڑوں کے لیے ناظرہ قرآن، تجوید، حفظ، تفسیر اور عربی زبان کی ون ٹو ون کلاسز فراہم کرتی ہے۔"
+                settings?.footerDescriptionEn ||
+                  "Humna Academy is an online Quran and Islamic education academy offering one-to-one personalized learning in Quran Reading (Nazra), Tajweed, Hifz, Tafseer, and Arabic for children and adults worldwide.",
+                settings?.footerDescriptionUr ||
+                  "حُمنہ اکیڈمی ایک آن لائن قرآن و اسلامی تعلیمی اکیڈمی ہے جو دنیا بھر میں بچوں اور بڑوں کے لیے ناظرہ قرآن، تجوید، حفظ، تفسیر اور عربی زبان کی ون ٹو ون کلاسز فراہم کرتی ہے۔"
               )}
             </p>
 
@@ -32,7 +38,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-center gap-3">
                 {/* Facebook */}
                 <a
-                  href={ACADEMY_CONFIG.social.facebook}
+                  href={social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-lg bg-white/10 hover:bg-brand-gold hover:text-brand-deep flex items-center justify-center transition-colors text-white"
@@ -46,7 +52,7 @@ export const Footer: React.FC = () => {
 
                 {/* YouTube */}
                 <a
-                  href={ACADEMY_CONFIG.social.youtube}
+                  href={social.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-lg bg-white/10 hover:bg-brand-gold hover:text-brand-deep flex items-center justify-center transition-colors text-white"
@@ -60,7 +66,7 @@ export const Footer: React.FC = () => {
 
                 {/* TikTok */}
                 <a
-                  href={ACADEMY_CONFIG.social.tiktok}
+                  href={social.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-lg bg-white/10 hover:bg-brand-gold hover:text-brand-deep flex items-center justify-center transition-colors text-white"
@@ -74,7 +80,7 @@ export const Footer: React.FC = () => {
 
                 {/* Instagram */}
                 <a
-                  href={ACADEMY_CONFIG.social.instagram}
+                  href={social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-lg bg-white/10 hover:bg-brand-gold hover:text-brand-deep flex items-center justify-center transition-colors text-white"
@@ -139,7 +145,7 @@ export const Footer: React.FC = () => {
               {t("Popular Courses", "نمایاں کورسز")}
             </h4>
             <ul className="space-y-2.5 text-sm text-brand-cream/80">
-              {COURSES.slice(0, 6).map((c) => (
+              {courses.slice(0, 6).map((c) => (
                 <li key={c.id}>
                   <Link href={`/courses/${c.slug}`} className="hover:text-white transition-colors truncate block">
                     {t(c.title, c.titleUrdu)}
@@ -148,7 +154,7 @@ export const Footer: React.FC = () => {
               ))}
               <li>
                 <Link href="/courses" className="text-brand-gold hover:underline font-medium text-xs inline-flex items-center gap-1 mt-1">
-                  <span>{t("View All 13 Courses →", "تمام 13 کورسز دیکھیں ←")}</span>
+                  <span>{t(`View All ${courses.length} Courses →`, `تمام ${courses.length} کورسز دیکھیں ←`)}</span>
                 </Link>
               </li>
             </ul>
@@ -161,13 +167,13 @@ export const Footer: React.FC = () => {
             </h4>
             <div className="space-y-3 text-sm text-brand-cream/80">
               <a
-                href={`https://wa.me/${ACADEMY_CONFIG.whatsappRaw}`}
+                href={`https://wa.me/${whatsappRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-brand-cream hover:text-white group"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-                <span>+92 301 7291844</span>
+                <span>{phoneDisplay}</span>
               </a>
 
               <p className="text-xs text-brand-cream/70">
@@ -189,11 +195,11 @@ export const Footer: React.FC = () => {
                   <span>{t("Student Portal", "طالب علم پورٹل")}</span>
                 </Link>
                 <Link
-                  href="/portal/admin"
+                  href="/admin/login"
                   className="text-xs text-brand-cream/90 hover:text-white flex items-center gap-1.5"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" />
-                  <span>{t("Academy Admin Portal", "ایڈمن پورٹل")}</span>
+                  <span>{t("Academy Admin Panel", "ایڈمن پینل")}</span>
                 </Link>
               </div>
             </div>
@@ -203,7 +209,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar & Disclaimer */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-brand-cream/70">
           <div>
-            © {new Date().getFullYear()} {ACADEMY_CONFIG.name}. All rights reserved.
+            © {new Date().getFullYear()} {settings?.copyrightText || `${ACADEMY_CONFIG.name}. All rights reserved.`}
           </div>
 
           <div className="flex flex-wrap items-center gap-6">

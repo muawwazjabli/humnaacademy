@@ -14,24 +14,26 @@ import {
   ArrowRight,
   Globe2,
 } from "lucide-react";
-import { COURSES } from "@/data/courses";
 import { COMMON_TIMEZONES, TEACHING_LANGUAGES, ACADEMY_CONFIG } from "@/lib/constants";
 import { TrialBookingPayload } from "@/types";
 import { useLanguage } from "./LanguageContext";
+import { usePublicData } from "./PublicDataContext";
 
 export const TrialBookingForm: React.FC = () => {
   const { t, language } = useLanguage();
+  const { courses } = usePublicData();
   const searchParams = useSearchParams();
   const initialCourse = searchParams.get("course") || "";
 
   const [formData, setFormData] = useState<TrialBookingPayload>({
     fullName: "",
     ageGroup: "child",
+    studentAge: "",
     parentName: "",
     email: "",
     whatsappNumber: "",
     country: "",
-    preferredCourse: initialCourse || COURSES[0].title,
+    preferredCourse: initialCourse || courses[0]?.title || "Quran Reading Course (Nazra)",
     readingLevel: "Complete Beginner",
     preferredTeacher: "no_preference",
     preferredLanguage: "English",
@@ -354,7 +356,7 @@ export const TrialBookingForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, preferredCourse: e.target.value })}
               className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-emerald/40"
             >
-              {COURSES.map((c) => (
+              {courses.map((c) => (
                 <option key={c.id} value={c.title}>
                   {c.title}
                 </option>

@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
 import { LanguageProvider } from "@/components/LanguageContext";
-import { AnnouncementBar } from "@/components/AnnouncementBar";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
+import { PublicDataProvider } from "@/components/PublicDataContext";
+import { PublicShell } from "@/components/PublicShell";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://humnaacademy.com"),
@@ -85,11 +83,9 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col font-sans transition-colors duration-200">
         <ThemeProvider>
           <LanguageProvider>
-            <AnnouncementBar />
-            <Navbar />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-            <WhatsAppFloatingButton />
+            <PublicDataProvider>
+              <PublicShell>{children}</PublicShell>
+            </PublicDataProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

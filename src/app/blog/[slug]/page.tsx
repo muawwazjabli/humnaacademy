@@ -12,13 +12,16 @@ import {
   MessageCircle
 } from "lucide-react";
 import { BLOG_POSTS } from "@/data/blog";
+import { fetchPublicSiteBundle } from "@/lib/public-data";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { Metadata } from "next";
 
-export async function generateStaticParams() {
-  return BLOG_POSTS.map((post) => ({
-    slug: post.slug,
-  }));
+export const dynamic = "force-dynamic";
+
+async function findBlog(slug: string) {
+  const bundle = await fetchPublicSiteBundle();
+  const post = bundle.blogs.find((p) => p.slug === slug) || BLOG_POSTS.find((p) => p.slug === slug);
+  return { post, allBlogs: bundle.blogs };
 }
 
 export async function generateMetadata({
@@ -26,16 +29,16 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const post = BLOG_POSTS.find((p) => p.slug === params.slug);
+  const { post } = await findBlog(params.slug);
   if (!post) {
     return { title: "Article Not Found | Humna Academy" };
   }
   return {
-    title: `${post.title} | Humna Academy Blog`,
-    description: post.excerpt,
+    title: post.metaTitle || `${post.title} | Humna Academy Blog`,
+    description: post.metaDescription || post.excerpt,
     openGraph: {
-      title: `${post.title} | Humna Academy`,
-      description: post.excerpt,
+      title: post.metaTitle || `${post.title} | Humna Academy`,
+      description: post.metaDescription || post.excerpt,
       type: "article",
       publishedTime: post.publishedAt,
       authors: [post.author.name],
@@ -43,18 +46,18 @@ export async function generateMetadata({
   };
 }
 
-export default function BlogDetailPage({
+export default async function BlogDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const post = BLOG_POSTS.find((p) => p.slug === params.slug);
+  const { post, allBlogs } = await findBlog(params.slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const relatedPosts = allBlogs.filter((p) => p.slug !== post.slug).slice(0, 3);
 
   return (
     <article className="py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">

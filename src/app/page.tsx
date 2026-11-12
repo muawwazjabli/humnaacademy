@@ -20,25 +20,36 @@ import {
   Heart,
   Volume2
 } from "lucide-react";
-import { COURSES } from "@/data/courses";
-import { TEACHER_PROFILES } from "@/data/teachers";
-import { PRICING_PLANS, PRICING_CURRENCIES, SupportedCurrency } from "@/data/pricing";
-import { FAQS } from "@/data/faqs";
+import { PRICING_CURRENCIES, SupportedCurrency } from "@/data/pricing";
 import { CourseCard } from "@/components/CourseCard";
 import { TeacherCard } from "@/components/TeacherCard";
 import { PricingCard } from "@/components/PricingCard";
 import { HeroSlider } from "@/components/HeroSlider";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePublicData } from "@/components/PublicDataContext";
 
 export default function HomePage() {
   const { t, language } = useLanguage();
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
+  const {
+    courses,
+    teachers,
+    pricingPlans,
+    faqs,
+    testimonials,
+    gallery,
+    websiteContent,
+    settings,
+  } = usePublicData();
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>(
+    (settings?.defaultCurrency as SupportedCurrency) || "USD"
+  );
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const categories = [
     "All",
     "Foundation",
+    "Recitation & Tajweed",
     "Recitation & Rules",
     "Memorization",
     "Islamic Knowledge",
@@ -46,8 +57,8 @@ export default function HomePage() {
 
   const filteredCourses =
     selectedCategory === "All"
-      ? COURSES.filter((c) => c.featured)
-      : COURSES.filter((c) => c.category === selectedCategory);
+      ? courses.filter((c) => c.featured)
+      : courses.filter((c) => c.category === selectedCategory);
 
   const features = [
     {
@@ -182,23 +193,28 @@ export default function HomePage() {
                 <Sparkles className="w-4 h-4 text-brand-gold" />
                 <span>
                   {t(
-                    "Online Quran & Islamic Academy for Global Students",
-                    "دنیا بھر کے طلباء کے لیے آن لائن قرآن اکیڈمی"
+                    websiteContent.hero?.badgeEn || "Online Quran & Islamic Academy for Global Students",
+                    websiteContent.hero?.badgeUr || "دنیا بھر کے طلباء کے لیے آن لائن قرآن اکیڈمی"
                   )}
                 </span>
               </div>
 
               <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.15]">
-                {t("Learn Quran Online with", "آن لائن قرآن مجید سیکھیں")}{" "}
+                {t(
+                  websiteContent.hero?.headingEn || "Learn Quran Online with",
+                  websiteContent.hero?.headingUr || "آن لائن قرآن مجید سیکھیں"
+                )}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-brand-goldLight to-brand-gold">
-                  Humna Academy
+                  {settings?.academyName || "Humna Academy"}
                 </span>
               </h1>
 
               <p className="text-base sm:text-lg text-brand-cream/85 max-w-2xl leading-relaxed mx-auto lg:mx-0">
                 {t(
-                  "Learn Quran recitation, Tajweed, Hifz, and Islamic Studies with personalized online lessons designed for children and adults worldwide.",
-                  "بچوں اور بڑوں کے لیے ناظرہ قرآن، تجوید، حفظ اور اسلامی تعلیمات کے انفرادی اور معیاری آن لائن اسباق۔"
+                  websiteContent.hero?.subtitleEn ||
+                    "Learn Quran recitation, Tajweed, Hifz, and Islamic Studies with personalized online lessons designed for children and adults worldwide.",
+                  websiteContent.hero?.subtitleUr ||
+                    "بچوں اور بڑوں کے لیے ناظرہ قرآن، تجوید، حفظ اور اسلامی تعلیمات کے انفرادی اور معیاری آن لائن اسباق۔"
                 )}
               </p>
 
@@ -543,7 +559,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {TEACHER_PROFILES.map((teacher) => (
+          {teachers.map((teacher) => (
             <TeacherCard key={teacher.id} teacher={teacher} />
           ))}
         </div>
@@ -595,7 +611,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {PRICING_PLANS.map((plan) => (
+          {pricingPlans.map((plan) => (
             <PricingCard key={plan.id} plan={plan} currency={selectedCurrency} />
           ))}
         </div>
@@ -608,32 +624,117 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="text-brand-emerald font-bold hover:underline"
           >
-            {t("Contact us directly on WhatsApp (+92 301 7291844)", "واٹس ایپ پر رابطہ کریں (+92 301 7291844)")}
+            {t(
+              `Contact us directly on WhatsApp (${settings?.phoneDisplay || "+92 301 7291844"})`,
+              `واٹس ایپ پر رابطہ کریں (${settings?.phoneDisplay || "+92 301 7291844"})`
+            )}
           </a>
         </div>
       </section>
 
-      {/* ===================== TESTIMONIALS (HONEST STATUS) ===================== */}
-      <section className="bg-white py-16 border-y border-brand-border/60">
-        <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-brand-gold bg-brand-cream px-3 py-1 rounded-full border border-brand-gold/30">
-            {t("Parent & Student Feedback", "طلباء اور والدین کی آراء")}
-          </span>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900">
-            {t("Awaiting Verified Parent & Student Reviews", "تصدیق شدہ تاثرات و آراء")}
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-xl mx-auto">
-            {t(
-              "Humna Academy strictly refrains from publishing fabricated testimonials or artificial ratings. As enrolled families complete evaluation cycles, genuine verified parent and student feedback will be published here with explicit permission.",
-              "حُمنہ اکیڈمی کسی قسم کے من گھڑت یا جعلی ریویوز شائع کرنے سے مکمل پرہیز کرتی ہے۔ کورسز مکمل کرنے والے طلباء اور والدین کے اصل تاثرات یہاں جلد پیش کیے جائیں گے۔"
-            )}
-          </p>
-          <div className="pt-2">
-            <span className="text-xs text-brand-emerald font-semibold">
-              {t("Currently Enrolled? Share your feedback with our academic coordinator.", "کیا آپ زیرِ تعلیم ہیں؟ اپنے تاثرات واٹس ایپ پر شیئر کریں۔")}
+      {/* ===================== ACADEMY GALLERY (IF PUBLISHED ITEMS EXIST) ===================== */}
+      {gallery.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-emerald bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+              {t("Academy Gallery", "اکیڈمی گیلری")}
             </span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900">
+              {t("Moments & Highlights", "اکیڈمی کی جھلکیاں")}
+            </h2>
           </div>
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {gallery.slice(0, 8).map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-2xl border border-brand-border/80 overflow-hidden shadow-sm group"
+              >
+                <div className="aspect-video overflow-hidden bg-gray-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-3.5">
+                  <span className="text-[10px] font-bold uppercase text-brand-emerald">
+                    {item.category}
+                  </span>
+                  <h4 className="font-bold text-sm text-gray-900 truncate">{item.title}</h4>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ===================== TESTIMONIALS ===================== */}
+      <section className="bg-white py-16 border-y border-brand-border/60">
+        {testimonials.length > 0 ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand-gold bg-brand-cream px-3 py-1 rounded-full border border-brand-gold/30">
+                {t("Verified Parent & Student Feedback", "طلباء اور والدین کی آراء")}
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900">
+                {t("Voices from Our Global Families", "دنیا بھر کے والدین اور طلباء کے تاثرات")}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonials.slice(0, 6).map((item) => (
+                <div
+                  key={item.id}
+                  className="p-6 rounded-2xl bg-brand-creamLight border border-brand-border/80 space-y-4 flex flex-col justify-between"
+                >
+                  <p className="text-sm text-gray-700 leading-relaxed italic">
+                    &quot;{item.text}&quot;
+                  </p>
+                  <div className="flex items-center gap-3 pt-2 border-t border-brand-border/50">
+                    {item.profileImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.profileImage}
+                        alt={item.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-brand-deep text-brand-gold font-bold text-xs flex items-center justify-center">
+                        {item.name.slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-bold text-sm text-gray-900 block">{item.name}</span>
+                      <span className="text-xs text-gray-500">
+                        {item.country} {item.courseName ? `• ${item.courseName}` : ""}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-gold bg-brand-cream px-3 py-1 rounded-full border border-brand-gold/30">
+              {t("Parent & Student Feedback", "طلباء اور والدین کی آراء")}
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900">
+              {t("Awaiting Verified Parent & Student Reviews", "تصدیق شدہ تاثرات و آراء")}
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-xl mx-auto">
+              {t(
+                "Humna Academy strictly refrains from publishing fabricated testimonials or artificial ratings. As enrolled families complete evaluation cycles, genuine verified parent and student feedback will be published here with explicit permission.",
+                "حُمنہ اکیڈمی کسی قسم کے من گھڑت یا جعلی ریویوز شائع کرنے سے مکمل پرہیز کرتی ہے۔ کورسز مکمل کرنے والے طلباء اور والدین کے اصل تاثرات یہاں جلد پیش کیے جائیں گے۔"
+              )}
+            </p>
+            <div className="pt-2">
+              <span className="text-xs text-brand-emerald font-semibold">
+                {t("Currently Enrolled? Share your feedback with our academic coordinator.", "کیا آپ زیرِ تعلیم ہیں؟ اپنے تاثرات واٹس ایپ پر شیئر کریں۔")}
+              </span>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ===================== FAQ PREVIEW ===================== */}
@@ -654,7 +755,7 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-4">
-          {FAQS.slice(0, 6).map((faq) => (
+          {faqs.slice(0, 6).map((faq) => (
             <div
               key={faq.id}
               className="bg-white rounded-2xl border border-brand-border/70 p-6 shadow-sm hover:border-brand-emerald/40 transition-colors"
@@ -664,7 +765,7 @@ export default function HomePage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-serif font-bold text-base text-gray-900">
-                      {faq.question}
+                      {t(faq.question, faq.questionUrdu || faq.question)}
                     </h3>
                     {faq.isPolicyConfirmed ? (
                       <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-brand-emerald font-semibold">
@@ -677,7 +778,7 @@ export default function HomePage() {
                     )}
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                    {faq.answer}
+                    {t(faq.answer, faq.answerUrdu || faq.answer)}
                   </p>
                 </div>
               </div>

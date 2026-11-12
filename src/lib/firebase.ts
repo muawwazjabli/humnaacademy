@@ -81,6 +81,7 @@ export async function saveTrialBookingToFirebase(
       referenceId: { stringValue: referenceId },
       fullName: { stringValue: data.fullName || "" },
       ageGroup: { stringValue: data.ageGroup || "child" },
+      studentAge: { stringValue: data.studentAge || "" },
       parentName: { stringValue: data.parentName || "" },
       email: { stringValue: data.email || "" },
       whatsappNumber: { stringValue: data.whatsappNumber || "" },
@@ -99,9 +100,10 @@ export async function saveTrialBookingToFirebase(
       preferredTime: { stringValue: data.preferredTime || "Flexible" },
       timeZone: { stringValue: data.timeZone || "UTC" },
       additionalMessage: { stringValue: data.additionalMessage || "" },
-      status: { stringValue: "new" },
+      status: { stringValue: "New" },
       source: { stringValue: "Humna Academy Website" },
       createdAt: { timestampValue: new Date().toISOString() },
+      updatedAt: { timestampValue: new Date().toISOString() },
     };
 
     const res = await fetch(url, {

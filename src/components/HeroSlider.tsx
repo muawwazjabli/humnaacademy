@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Sparkles, Calendar, MessageCircle } from "lucide-react";
 import { useLanguage } from "./LanguageContext";
+import { usePublicData } from "./PublicDataContext";
 import { ACADEMY_CONFIG } from "@/lib/constants";
 
 interface SlideItem {
@@ -14,7 +15,7 @@ interface SlideItem {
   altUr: string;
 }
 
-const SLIDES: SlideItem[] = [
+const DEFAULT_SLIDES: SlideItem[] = [
   {
     id: 1,
     image: "/1.jpg",
@@ -47,6 +48,18 @@ export const HeroSlider: React.FC = () => {
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const { t, language } = useLanguage();
+  const { websiteContent, settings } = usePublicData();
+
+  const configuredSlides = (websiteContent.hero?.slides || []).filter((s) => s.imageUrl);
+  const SLIDES: SlideItem[] =
+    configuredSlides.length > 0
+      ? configuredSlides.map((s, idx) => ({
+          id: idx + 1,
+          image: s.imageUrl,
+          altEn: s.altEn || "Humna Academy",
+          altUr: s.altUr || "حُمنہ اکیڈمی",
+        }))
+      : DEFAULT_SLIDES;
 
   const totalSlides = SLIDES.length;
 
@@ -200,7 +213,7 @@ export const HeroSlider: React.FC = () => {
             </Link>
 
             <a
-              href={`https://wa.me/${ACADEMY_CONFIG.whatsappRaw}`}
+              href={`https://wa.me/${settings?.whatsappNumber || ACADEMY_CONFIG.whatsappRaw}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white/10 hover:bg-emerald-600/30 text-brand-cream text-xs sm:text-sm font-medium border border-white/20 transition-colors"

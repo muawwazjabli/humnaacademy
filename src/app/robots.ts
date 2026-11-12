@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/portal/admin", "/api/"],
+      disallow: ["/admin", "/portal/admin", "/portal/student", "/api/"],
     },
     sitemap: "https://humnaacademy.com/sitemap.xml",
   };

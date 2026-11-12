@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TrialBookingPayload } from "@/types";
 import { saveTrialBookingToFirebase, isFirebaseConfigured } from "@/lib/firebase";
+import { createAdminNotification } from "@/lib/auth-server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -52,6 +53,13 @@ export async function POST(req: NextRequest) {
       if (fbResult.success) {
         isPersistedToDatabase = true;
         databaseType = "firebase";
+        await createAdminNotification(
+          "trial",
+          "New Free Trial Request",
+          `${data.fullName} requested a trial for ${data.preferredCourse} (${data.country || "International"}).`,
+          "/admin/trial-requests",
+          fbResult.id || referenceId
+        );
       } else {
         console.warn("Firebase save warning:", fbResult.error);
       }
