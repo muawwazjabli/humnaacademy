@@ -9,6 +9,9 @@
 
 # Environment Variables
 .env*.local
+*adminsdk*.json
+*service-account*.json
+*.pem
 
 # Debug logs
 npm-debug.log*
