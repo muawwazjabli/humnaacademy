@@ -12,6 +12,13 @@ import {
   X,
   Loader2,
   UserCheck,
+  Clock,
+  Calendar,
+  Key,
+  Video,
+  Copy,
+  Check,
+  EyeOff,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { useAdmin } from "@/components/admin/AdminContext";
@@ -34,6 +41,12 @@ const EMPTY_STUDENT: Partial<StudentRecord> = {
   selectedCourse: "Quran Reading Course (Nazra)",
   assignedTeacherId: "",
   assignedTeacherName: "",
+  classTime: "",
+  classDays: "Mon, Wed, Fri",
+  classDuration: "30 mins",
+  meetingLink: "",
+  portalUsername: "",
+  portalPassword: "",
   enrollmentDate: new Date().toISOString().slice(0, 10),
   status: "Active",
   adminNotes: "",
@@ -54,6 +67,21 @@ export default function AdminStudentsPage() {
   const [isNew, setIsNew] = useState(true);
   const [form, setForm] = useState<Partial<StudentRecord>>(EMPTY_STUDENT);
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [copiedCreds, setCopiedCreds] = useState(false);
+
+  const generateStudentPassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    let pass = "HA@";
+    for (let i = 0; i < 6; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setForm((prev) => ({
+      ...prev,
+      portalPassword: pass,
+      portalUsername: prev.portalUsername || (prev.fullName ? prev.fullName.toLowerCase().replace(/[^a-z0-9]/g, "") + Math.floor(100 + Math.random() * 900) : "student" + Math.floor(1000 + Math.random() * 9000)),
+    }));
+  };
 
   const [profileView, setProfileView] = useState<StudentRecord | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<StudentRecord | null>(null);
@@ -291,9 +319,19 @@ export default function AdminStudentsPage() {
                       <span className="font-semibold text-gray-900 dark:text-white block">
                         {student.selectedCourse}
                       </span>
-                      <span className="text-[11px] text-gray-500">
+                      <span className="text-[11px] text-gray-500 block">
                         Teacher: {student.assignedTeacherName || "Unassigned"}
                       </span>
+                      {student.classTime && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-brand-emerald dark:text-brand-gold font-medium mt-0.5">
+                          <Clock className="w-3 h-3" /> {student.classTime} {student.classDays ? `(${student.classDays})` : ""}
+                        </span>
+                      )}
+                      {student.portalUsername && (
+                        <span className="block text-[10px] text-amber-700 dark:text-amber-400 font-mono">
+                          ID: {student.portalUsername}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
                       {student.enrollmentDate || "—"}
@@ -511,6 +549,113 @@ export default function AdminStudentsPage() {
                 </div>
               </div>
 
+              {/* Class Schedule & Timing */}
+              <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/50 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-brand-emerald dark:text-brand-gold" />
+                  <span className="font-bold text-xs uppercase tracking-wider text-brand-deep dark:text-brand-gold">
+                    Class Schedule & Timings (کلاس کی ٹائمنگ اور دن)
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">Class Time (ٹائمنگ)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 05:00 PM (PKT)"
+                      value={form.classTime || ""}
+                      onChange={(e) => setForm({ ...form, classTime: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Class Days (دن)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Mon, Wed, Fri"
+                      value={form.classDays || ""}
+                      onChange={(e) => setForm({ ...form, classDays: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Duration (دورانیہ)</label>
+                    <select
+                      value={form.classDuration || "30 mins"}
+                      onChange={(e) => setForm({ ...form, classDuration: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    >
+                      <option value="30 mins">30 mins</option>
+                      <option value="45 mins">45 mins</option>
+                      <option value="60 mins">60 mins</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="font-semibold block mb-1">Live Class Meeting Link (Zoom / Google Meet URL)</label>
+                  <input
+                    type="url"
+                    placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                    value={form.meetingLink || ""}
+                    onChange={(e) => setForm({ ...form, meetingLink: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                  />
+                </div>
+              </div>
+
+              {/* Student Portal Login Credentials */}
+              <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Key className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span className="font-bold text-xs uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                      Student Portal Login (اسٹوڈنٹ پورٹل لاگ ان اور پاسورڈ)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={generateStudentPassword}
+                    className="text-[11px] font-bold text-brand-emerald hover:underline flex items-center gap-1"
+                  >
+                    Generate Credentials
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">Portal Username / Login ID</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. muawwaz or student123"
+                      value={form.portalUsername || ""}
+                      onChange={(e) => setForm({ ...form, portalUsername: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Portal Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter or generate password"
+                        value={form.portalPassword || ""}
+                        onChange={(e) => setForm({ ...form, portalPassword: e.target.value })}
+                        className="w-full px-3 py-2 pr-10 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-500">
+                  طالب علم یا والدین اس یوزرنیم اور پاسورڈ کے ذریعے <span className="font-mono text-brand-emerald">/portal/student</span> پر لاگ ان ہو کر اپنی کلاس کی ٹائمنگ اور پروفائل دیکھ سکیں گے۔
+                </p>
+              </div>
+
               <div>
                 <label className="font-semibold block mb-1">Administrative Notes</label>
                 <textarea
@@ -591,6 +736,56 @@ export default function AdminStudentsPage() {
               <div>
                 <span className="text-gray-400 block">Assigned Teacher</span>
                 <span className="font-semibold">{profileView.assignedTeacherName || "Unassigned"}</span>
+              </div>
+              <div className="col-span-2 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40">
+                <span className="text-gray-500 dark:text-emerald-300 block font-bold mb-1 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" /> Class Schedule & Timing
+                </span>
+                <p className="font-semibold text-emerald-900 dark:text-emerald-100">
+                  {profileView.classTime || "Timing not set"} • {profileView.classDays || "Days not set"} ({profileView.classDuration || "30 mins"})
+                </p>
+                {profileView.meetingLink && (
+                  <a
+                    href={profileView.meetingLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]"
+                  >
+                    <Video className="w-3 h-3" /> Join Live Class
+                  </a>
+                )}
+              </div>
+              <div className="col-span-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-amber-800 dark:text-amber-300 font-bold flex items-center gap-1">
+                    <Key className="w-3.5 h-3.5" /> Student Portal Login Credentials
+                  </span>
+                  {profileView.portalUsername && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `Humna Academy Portal Login:\nWebsite: https://humnaacademy.com/portal/student\nUsername: ${profileView.portalUsername}\nPassword: ${profileView.portalPassword || "N/A"}`
+                        );
+                        setCopiedCreds(true);
+                        setTimeout(() => setCopiedCreds(false), 2000);
+                      }}
+                      className="text-[11px] font-bold text-amber-700 hover:underline flex items-center gap-1"
+                    >
+                      {copiedCreds ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedCreds ? "Copied!" : "Copy for Student"}
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-gray-400 block text-[10px]">Username:</span>
+                    <span className="font-mono font-bold">{profileView.portalUsername || "Not set"}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block text-[10px]">Password:</span>
+                    <span className="font-mono font-bold">{profileView.portalPassword || "Not set"}</span>
+                  </div>
+                </div>
               </div>
               {profileView.trialReferenceId && (
                 <div className="col-span-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Plus, Edit3, Trash2, Eye, EyeOff, X, Loader2, ShieldAlert } from "lucide-react";
+import { Plus, Edit3, Trash2, Eye, EyeOff, X, Loader2, ShieldAlert, Key, Copy, Check, Users } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { useAdmin } from "@/components/admin/AdminContext";
 import { ConfirmModal } from "@/components/admin/ConfirmModal";
@@ -26,6 +26,10 @@ const EMPTY_TEACHER: Partial<TeacherProfile> = {
   status: "published",
   active: true,
   displayOrder: 1,
+  portalUsername: "",
+  portalPassword: "",
+  phone: "",
+  email: "",
 };
 
 export default function AdminTeachersPage() {
@@ -38,6 +42,24 @@ export default function AdminTeachersPage() {
   const [isNew, setIsNew] = useState(true);
   const [form, setForm] = useState<Partial<TeacherProfile>>(EMPTY_TEACHER);
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const generateTeacherPassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    let pass = "HT@";
+    for (let i = 0; i < 6; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setForm((prev) => ({
+      ...prev,
+      portalPassword: pass,
+      portalUsername:
+        prev.portalUsername ||
+        (prev.name
+          ? prev.name.toLowerCase().replace(/[^a-z0-9]/g, "") + Math.floor(10 + Math.random() * 90)
+          : "teacher" + Math.floor(100 + Math.random() * 900)),
+    }));
+  };
 
   const [deleteTarget, setDeleteTarget] = useState<TeacherProfile | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -247,6 +269,11 @@ export default function AdminTeachersPage() {
                   <p>
                     <strong>Languages:</strong> {(teacher.languages || []).join(", ")}
                   </p>
+                  {teacher.portalUsername && (
+                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-mono flex items-center gap-1">
+                      <Key className="w-3 h-3" /> Portal ID: <strong>{teacher.portalUsername}</strong>
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -412,6 +439,81 @@ export default function AdminTeachersPage() {
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
                   />
                 </div>
+              </div>
+
+              {/* Teacher Portal Login Credentials */}
+              <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Key className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span className="font-bold text-xs uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                      Teacher Portal Login (ٹیچر پورٹل لاگ ان اور پاسورڈ)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={generateTeacherPassword}
+                    className="text-[11px] font-bold text-brand-emerald hover:underline flex items-center gap-1"
+                  >
+                    Generate Credentials
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">Portal Username / Login ID</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. qari.ahmad or teacher1"
+                      value={form.portalUsername || ""}
+                      onChange={(e) => setForm({ ...form, portalUsername: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Portal Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter or generate password"
+                        value={form.portalPassword || ""}
+                        onChange={(e) => setForm({ ...form, portalPassword: e.target.value })}
+                        className="w-full px-3 py-2 pr-10 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">Teacher WhatsApp / Phone</label>
+                    <input
+                      type="text"
+                      placeholder="+92 300 1234567"
+                      value={form.phone || ""}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Teacher Email</label>
+                    <input
+                      type="email"
+                      placeholder="teacher@humnaacademy.com"
+                      value={form.email || ""}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#081d16]"
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-500">
+                  اساتذہ اس یوزرنیم اور پاسورڈ سے <span className="font-mono text-brand-emerald">/portal/teacher</span> پر لاگ ان ہو کر اپنے تمام تفویض کردہ طلباء، ان کی کلاس کی ٹائمنگ اور شیڈول دیکھ سکیں گے۔
+                </p>
               </div>
 
               {courses.length > 0 && (

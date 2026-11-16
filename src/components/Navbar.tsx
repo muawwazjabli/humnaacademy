@@ -23,6 +23,7 @@ export const Navbar: React.FC = () => {
     { href: "/blog", labelEn: "Blog", labelUr: "بلاگ" },
     { href: "/faq", labelEn: "FAQ", labelUr: "عمومی سوالات" },
     { href: "/contact", labelEn: "Contact Us", labelUr: "رابطہ کریں" },
+    { href: "/portal", labelEn: "Portal", labelUr: "پورٹل" },
   ];
 
   const isActive = (path: string) => {

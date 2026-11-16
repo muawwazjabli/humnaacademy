@@ -55,6 +55,10 @@ export interface TeacherProfile {
   status?: PublishStatus;
   active?: boolean;
   displayOrder?: number;
+  portalUsername?: string;     // Teacher Login Username
+  portalPassword?: string;     // Teacher Login Password
+  phone?: string;
+  email?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -174,6 +178,12 @@ export interface StudentRecord {
   selectedCourse: string;
   assignedTeacherId?: string;
   assignedTeacherName?: string;
+  classTime?: string;          // e.g. "05:00 PM"
+  classDays?: string;          // e.g. "Monday, Wednesday, Friday"
+  classDuration?: string;      // e.g. "30 mins"
+  meetingLink?: string;        // Zoom / Google Meet link
+  portalUsername?: string;     // Student Login Username
+  portalPassword?: string;     // Student Login Password
   enrollmentDate: string;
   status: StudentStatus;
   adminNotes?: string;

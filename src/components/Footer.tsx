@@ -195,6 +195,13 @@ export const Footer: React.FC = () => {
                   <span>{t("Student Portal", "طالب علم پورٹل")}</span>
                 </Link>
                 <Link
+                  href="/portal/teacher"
+                  className="text-xs text-brand-cream/90 hover:text-white flex items-center gap-1.5"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" />
+                  <span>{t("Teacher Portal", "اساتذہ پورٹل")}</span>
+                </Link>
+                <Link
                   href="/admin/login"
                   className="text-xs text-brand-cream/90 hover:text-white flex items-center gap-1.5"
                 >
