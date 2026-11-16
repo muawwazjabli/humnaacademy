@@ -19,13 +19,46 @@ import {
   Phone,
   Globe,
   Sparkles,
+  Star,
+  Check,
+  X,
+  FileText,
 } from "lucide-react";
-import { StudentRecord, TeacherProfile } from "@/types";
+import { DailyClassReport, LeaveRequestRecord, StudentRecord, TeacherProfile } from "@/types";
+import { DigitalQuranReader } from "@/components/DigitalQuranReader";
 
 export default function TeacherPortalPage() {
   const [loading, setLoading] = useState(true);
   const [teacher, setTeacher] = useState<TeacherProfile | null>(null);
   const [students, setStudents] = useState<StudentRecord[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequestRecord[]>([]);
+
+  // Reader toggle
+  const [showReader, setShowReader] = useState(false);
+
+  // Daily Report Modal
+  const [reportModalStudent, setReportModalStudent] = useState<StudentRecord | null>(null);
+  const [reportForm, setReportForm] = useState<{
+    date: string;
+    attendance: "Present" | "Absent" | "Leave";
+    sabaq: string;
+    sabqi: string;
+    manzil: string;
+    tajweedMistakes: number;
+    rating: number;
+    teacherNotes: string;
+  }>({
+    date: new Date().toISOString().slice(0, 10),
+    attendance: "Present",
+    sabaq: "",
+    sabqi: "",
+    manzil: "",
+    tajweedMistakes: 0,
+    rating: 5,
+    teacherNotes: "",
+  });
+  const [savingReport, setSavingReport] = useState(false);
+  const [reportSuccess, setReportSuccess] = useState(false);
 
   // Login form state
   const [username, setUsername] = useState("");
@@ -41,6 +74,13 @@ export default function TeacherPortalPage() {
         const data = await res.json();
         setTeacher(data.teacher);
         setStudents(data.students || []);
+
+        // Load leave requests
+        const lRes = await fetch("/api/portal/leave-requests", { cache: "no-store" });
+        if (lRes.ok) {
+          const lData = await lRes.json();
+          setLeaveRequests(lData.requests || []);
+        }
       } else {
         setTeacher(null);
         setStudents([]);
@@ -86,6 +126,57 @@ export default function TeacherPortalPage() {
       setStudents([]);
     } catch {
       // ignore
+    }
+  };
+
+  const handleSaveDailyReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportModalStudent) return;
+    setSavingReport(true);
+    try {
+      const res = await fetch("/api/portal/daily-reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId: reportModalStudent.id,
+          ...reportForm,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save report");
+      setReportSuccess(true);
+      setTimeout(() => {
+        setReportSuccess(false);
+        setReportModalStudent(null);
+        setReportForm({
+          date: new Date().toISOString().slice(0, 10),
+          attendance: "Present",
+          sabaq: "",
+          sabqi: "",
+          manzil: "",
+          tajweedMistakes: 0,
+          rating: 5,
+          teacherNotes: "",
+        });
+      }, 1500);
+    } catch (err) {
+      alert("Error saving report. Please try again.");
+    } finally {
+      setSavingReport(false);
+    }
+  };
+
+  const handleUpdateLeaveStatus = async (id: string, status: "approved" | "rejected") => {
+    try {
+      await fetch("/api/portal/leave-requests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      setLeaveRequests((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status } : r))
+      );
+    } catch {
+      alert("Failed to update status.");
     }
   };
 
@@ -224,14 +315,43 @@ export default function TeacherPortalPage() {
           </div>
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold transition-all"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowReader(!showReader)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-gold/20 hover:bg-brand-gold/30 border border-brand-gold/40 text-brand-gold text-xs font-bold transition-all shadow-sm"
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>{showReader ? "Hide Quran Reader" : "Open Quran / Qaida Reader"}</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold transition-all"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </div>
+
+      {/* Reader Drawer if opened */}
+      {showReader && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-serif text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-brand-gold" />
+              <span>Interactive Classroom Reader (قاعدہ و قرآن ریڈر)</span>
+            </h2>
+            <button
+              onClick={() => setShowReader(false)}
+              className="text-xs font-bold text-gray-500 hover:text-gray-700"
+            >
+              Close Reader ✕
+            </button>
+          </div>
+          <DigitalQuranReader />
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -285,6 +405,17 @@ export default function TeacherPortalPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
+                        {/* Daily Report Button */}
+                        <button
+                          onClick={() => {
+                            setReportModalStudent(student);
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>روزانہ سبق درج کریں</span>
+                        </button>
+
                         <a
                           href={`https://wa.me/${String(student.whatsappNumber || "").replace(/\D/g, "")}`}
                           target="_blank"
@@ -348,17 +479,79 @@ export default function TeacherPortalPage() {
                         </span>
                       </div>
                     </div>
-
-                    {student.adminNotes && (
-                      <p className="text-[11px] text-gray-500 italic bg-amber-50/50 dark:bg-amber-950/20 p-2 rounded-lg">
-                        <strong>Coordinator Note:</strong> {student.adminNotes}
-                      </p>
-                    )}
                   </div>
                 ))}
               </div>
             )}
           </div>
+
+          {/* Student Leave & Reschedule Requests Section */}
+          {leaveRequests.length > 0 && (
+            <div className="p-6 rounded-3xl bg-white dark:bg-[#0b231b] border border-gray-200 dark:border-emerald-800 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-emerald-900 pb-3">
+                <Calendar className="w-5 h-5 text-brand-emerald" />
+                <h2 className="font-serif text-lg font-bold text-gray-900 dark:text-white">
+                  Student Leave & Reschedule Requests (طلباء کی چھٹی کی درخواستیں)
+                </h2>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                {leaveRequests.map((req) => (
+                  <div
+                    key={req.id}
+                    className="p-4 rounded-2xl bg-gray-50 dark:bg-[#081d16] border border-gray-100 dark:border-emerald-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-900 dark:text-white">
+                          {req.studentName}
+                        </span>
+                        <span className="uppercase text-[9px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                          {req.type}
+                        </span>
+                        <span
+                          className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${
+                            req.status === "approved"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : req.status === "rejected"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {req.status}
+                        </span>
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-300 mt-1">
+                        <strong>Date:</strong> {req.date} {req.preferredNewTime ? `• Reschedule to: ${req.preferredNewTime}` : ""}
+                      </p>
+                      <p className="text-gray-500 italic mt-0.5">
+                        &quot;{req.reason}&quot;
+                      </p>
+                    </div>
+
+                    {req.status === "pending" && (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => handleUpdateLeaveStatus(req.id, "approved")}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-1 shadow-sm"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Approve</span>
+                        </button>
+                        <button
+                          onClick={() => handleUpdateLeaveStatus(req.id, "rejected")}
+                          className="px-3 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 font-bold flex items-center gap-1"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          <span>Reject</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column (1 Col): Teacher Bio & Availability */}
@@ -426,6 +619,163 @@ export default function TeacherPortalPage() {
           </div>
         </div>
       </div>
+
+      {/* Record Daily Sabaq Modal */}
+      {reportModalStudent && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0b231b] rounded-3xl border border-gray-200 dark:border-emerald-800 shadow-2xl max-w-lg w-full p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-emerald-900 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-gray-900 dark:text-white">
+                  روزانہ کلاس رپورٹ: {reportModalStudent.fullName}
+                </h3>
+                <p className="text-xs text-brand-emerald dark:text-brand-gold">
+                  Course: {reportModalStudent.selectedCourse}
+                </p>
+              </div>
+              <button
+                onClick={() => setReportModalStudent(null)}
+                className="p-1 text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            {reportSuccess ? (
+              <div className="py-8 text-center space-y-2">
+                <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
+                <p className="font-bold text-base text-gray-900 dark:text-white">
+                  کلاس رپورٹ کامیابی سے محفوظ ہو گئی!
+                </p>
+                <p className="text-xs text-gray-500">
+                  یہ رپورٹ طالب علم کے پورٹل پر ظاہر ہو چکی ہے۔
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSaveDailyReport} className="space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">کلاس کی تاریخ (Date)</label>
+                    <input
+                      type="date"
+                      required
+                      value={reportForm.date}
+                      onChange={(e) => setReportForm({ ...reportForm, date: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">حاضری (Attendance)</label>
+                    <select
+                      value={reportForm.attendance}
+                      onChange={(e) =>
+                        setReportForm({ ...reportForm, attendance: e.target.value as any })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    >
+                      <option value="Present">حاضر (Present)</option>
+                      <option value="Absent">غیر حاضر (Absent)</option>
+                      <option value="Leave">رخصت (Leave)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-semibold block mb-1">آج کا سبق (Sabaq - New Lesson)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. سورة البقرۃ آیات 1 تا 10 یا سبق نمبر 4 حرکات"
+                    value={reportForm.sabaq}
+                    onChange={(e) => setReportForm({ ...reportForm, sabaq: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">سبقی (حالیہ دہرائی - Sabqi)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. گزشتہ صفحہ 12"
+                      value={reportForm.sabqi}
+                      onChange={(e) => setReportForm({ ...reportForm, sabqi: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">منزل (پرانی دہرائی - Manzil)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. پارہ نمبر 1 مکمل"
+                      value={reportForm.manzil}
+                      onChange={(e) => setReportForm({ ...reportForm, manzil: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1">تجوید کی غلطیاں (Mistakes count)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={reportForm.tajweedMistakes}
+                      onChange={(e) =>
+                        setReportForm({ ...reportForm, tajweedMistakes: Number(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">کارکردگی ریٹنگ (1 to 5 Stars)</label>
+                    <select
+                      value={reportForm.rating}
+                      onChange={(e) => setReportForm({ ...reportForm, rating: Number(e.target.value) })}
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    >
+                      <option value={5}>⭐⭐⭐⭐⭐ ممتاز (Excellent)</option>
+                      <option value={4}>⭐⭐⭐⭐ بہت اچھا (Very Good)</option>
+                      <option value={3}>⭐⭐⭐ اچھا (Good)</option>
+                      <option value={2}>⭐⭐ مزید توجہ کی ضرورت (Needs Effort)</option>
+                      <option value={1}>⭐ ناقص (Poor)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-semibold block mb-1">استاد کے ریمارکس اور دعا (Teacher Feedback)</label>
+                  <textarea
+                    rows={2}
+                    placeholder="ماشاء اللہ بہت عمدہ پڑھا، مخارج درست ہیں..."
+                    value={reportForm.teacherNotes}
+                    onChange={(e) => setReportForm({ ...reportForm, teacherNotes: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-emerald-900">
+                  <button
+                    type="button"
+                    onClick={() => setReportModalStudent(null)}
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingReport}
+                    className="px-5 py-2 rounded-xl bg-amber-800 hover:bg-amber-900 text-white font-bold"
+                  >
+                    {savingReport ? "Saving..." : "Save Daily Report"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

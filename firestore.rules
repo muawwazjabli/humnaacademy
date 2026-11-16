@@ -121,5 +121,18 @@ service cloud.firestore {
       allow create: if isActiveAdmin();
       allow update, delete: if false; // Immutable audit trail
     }
+
+    // 7. Academic Progress, Leaves & Fees
+    match /dailyReports/{docId} {
+      allow read, write: if isSignedIn() || isActiveAdmin();
+    }
+
+    match /leaveRequests/{docId} {
+      allow read, write: if isSignedIn() || isActiveAdmin();
+    }
+
+    match /feeRecords/{docId} {
+      allow read, write: if isSignedIn() || isActiveAdmin();
+    }
   }
 }

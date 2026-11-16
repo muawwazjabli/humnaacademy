@@ -184,12 +184,61 @@ export interface StudentRecord {
   meetingLink?: string;        // Zoom / Google Meet link
   portalUsername?: string;     // Student Login Username
   portalPassword?: string;     // Student Login Password
+  monthlyFee?: string;         // e.g. "45" or "5000"
+  feeCurrency?: string;        // e.g. "USD", "GBP", "PKR"
   enrollmentDate: string;
   status: StudentStatus;
   adminNotes?: string;
   trialReferenceId?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DailyClassReport {
+  id: string;
+  studentId: string;
+  studentName: string;
+  teacherId: string;
+  teacherName: string;
+  date: string;
+  attendance: 'Present' | 'Absent' | 'Leave';
+  sabaq: string;
+  sabqi?: string;
+  manzil?: string;
+  tajweedMistakes?: number;
+  rating: number; // 1 to 5
+  teacherNotes?: string;
+  createdAt: string;
+}
+
+export interface LeaveRequestRecord {
+  id: string;
+  studentId: string;
+  studentName: string;
+  teacherId?: string;
+  teacherName?: string;
+  type: 'leave' | 'reschedule';
+  date: string;
+  preferredNewTime?: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeeRecord {
+  id: string;
+  studentId: string;
+  studentName: string;
+  month: string;
+  amount: string;
+  currency: string;
+  status: 'paid' | 'due' | 'verifying';
+  receiptUrl?: string;
+  paidAt?: string;
+  notes?: string;
+  createdAt: string;
 }
 
 export interface TestimonialRecord {

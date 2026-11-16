@@ -19,12 +19,17 @@ import {
   Copy,
   Check,
   EyeOff,
+  Award,
+  BookOpen,
+  DollarSign,
+  Star,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { useAdmin } from "@/components/admin/AdminContext";
 import { ConfirmModal } from "@/components/admin/ConfirmModal";
+import { CertificateModal } from "@/components/CertificateModal";
 import { exportRecordsToCSV } from "@/lib/csv-export";
-import { Course, StudentRecord, StudentStatus, TeacherProfile } from "@/types";
+import { Course, StudentRecord, StudentStatus, TeacherProfile, DailyClassReport } from "@/types";
 import { COMMON_TIMEZONES } from "@/lib/constants";
 
 const STUDENT_STATUSES: StudentStatus[] = ["Active", "Pending", "Completed", "Inactive"];
@@ -47,6 +52,8 @@ const EMPTY_STUDENT: Partial<StudentRecord> = {
   meetingLink: "",
   portalUsername: "",
   portalPassword: "",
+  monthlyFee: "40",
+  feeCurrency: "USD",
   enrollmentDate: new Date().toISOString().slice(0, 10),
   status: "Active",
   adminNotes: "",
@@ -86,6 +93,26 @@ export default function AdminStudentsPage() {
   const [profileView, setProfileView] = useState<StudentRecord | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<StudentRecord | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [certificateStudent, setCertificateStudent] = useState<StudentRecord | null>(null);
+  const [reportStudent, setReportStudent] = useState<StudentRecord | null>(null);
+  const [studentReports, setStudentReports] = useState<DailyClassReport[]>([]);
+  const [loadingReports, setLoadingReports] = useState(false);
+
+  const viewStudentReports = async (student: StudentRecord) => {
+    setReportStudent(student);
+    setLoadingReports(true);
+    try {
+      const res = await fetch(`/api/portal/daily-reports?studentId=${student.id}`);
+      if (res.ok) {
+        const j = await res.json();
+        setStudentReports(j.reports || []);
+      }
+    } catch {
+      showToast("error", "Failed to load student daily reports.");
+    } finally {
+      setLoadingReports(false);
+    }
+  };
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -327,6 +354,11 @@ export default function AdminStudentsPage() {
                           <Clock className="w-3 h-3" /> {student.classTime} {student.classDays ? `(${student.classDays})` : ""}
                         </span>
                       )}
+                      {student.monthlyFee && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-blue-700 dark:text-blue-300 font-semibold block">
+                          Fee: {student.feeCurrency || "USD"} {student.monthlyFee}/mo
+                        </span>
+                      )}
                       {student.portalUsername && (
                         <span className="block text-[10px] text-amber-700 dark:text-amber-400 font-mono">
                           ID: {student.portalUsername}
@@ -353,6 +385,20 @@ export default function AdminStudentsPage() {
                     </td>
                     <td className="px-4 py-3.5 text-right whitespace-nowrap">
                       <div className="inline-flex items-center gap-1.5">
+                        <button
+                          onClick={() => viewStudentReports(student)}
+                          className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-300"
+                          title="View Sabaq Diary"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => setCertificateStudent(student)}
+                          className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-500 hover:text-white text-amber-700 dark:text-amber-300"
+                          title="Generate Certificate"
+                        >
+                          <Award className="w-3.5 h-3.5" />
+                        </button>
                         <button
                           onClick={() => setProfileView(student)}
                           className="p-2 rounded-lg bg-gray-100 dark:bg-emerald-950 hover:bg-brand-emerald hover:text-white"
@@ -546,6 +592,30 @@ export default function AdminStudentsPage() {
                       </option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <label className="font-semibold block mb-1">Monthly Tuition Fee (ماہانہ فیس)</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={form.feeCurrency || "USD"}
+                      onChange={(e) => setForm({ ...form, feeCurrency: e.target.value })}
+                      className="w-24 px-2 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="GBP">GBP (£)</option>
+                      <option value="PKR">PKR (Rs)</option>
+                      <option value="CAD">CAD (C$)</option>
+                      <option value="AUD">AUD (A$)</option>
+                      <option value="EUR">EUR (€)</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="e.g. 40 or 5000"
+                      value={form.monthlyFee || ""}
+                      onChange={(e) => setForm({ ...form, monthlyFee: e.target.value })}
+                      className="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-[#081d16]"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -787,6 +857,19 @@ export default function AdminStudentsPage() {
                   </div>
                 </div>
               </div>
+              {profileView.monthlyFee && (
+                <div className="col-span-2 p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase font-bold block">Monthly Tuition Fee</span>
+                      <span className="font-bold text-sm text-blue-900 dark:text-blue-100">
+                        {profileView.feeCurrency || "USD"} {profileView.monthlyFee} / Month
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
               {profileView.trialReferenceId && (
                 <div className="col-span-2">
                   <span className="text-gray-400 block">Trial History Reference</span>
@@ -802,7 +885,31 @@ export default function AdminStudentsPage() {
               </div>
             )}
 
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-emerald-900">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const st = profileView;
+                    setProfileView(null);
+                    viewStudentReports(st);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-xs font-bold hover:bg-emerald-200 flex items-center gap-1.5"
+                >
+                  <BookOpen className="w-3.5 h-3.5" /> Sabaq Diary
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const st = profileView;
+                    setProfileView(null);
+                    setCertificateStudent(st);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-200 text-xs font-bold hover:bg-amber-200 flex items-center gap-1.5"
+                >
+                  <Award className="w-3.5 h-3.5" /> Certificate
+                </button>
+              </div>
               <button
                 onClick={() => setProfileView(null)}
                 className="px-4 py-2 rounded-xl bg-brand-deep text-white text-xs font-semibold"
@@ -812,6 +919,107 @@ export default function AdminStudentsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Daily Sabaq Reports Modal */}
+      {reportStudent && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0b231b] rounded-3xl border border-gray-200 dark:border-emerald-800 shadow-2xl max-w-2xl w-full p-6 space-y-4 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-emerald-900 pb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-brand-emerald" />
+                <h3 className="font-serif text-lg font-bold">
+                  Daily Sabaq Diary: {reportStudent.fullName}
+                </h3>
+              </div>
+              <button onClick={() => setReportStudent(null)} className="p-1 text-gray-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+              {loadingReports ? (
+                <div className="py-12 text-center text-xs text-gray-500">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-brand-emerald mb-2" />
+                  Loading diary reports...
+                </div>
+              ) : studentReports.length === 0 ? (
+                <div className="py-12 text-center text-xs text-gray-400">
+                  No daily class reports logged yet for this student.
+                </div>
+              ) : (
+                studentReports.map((r) => (
+                  <div
+                    key={r.id}
+                    className="p-4 rounded-2xl bg-gray-50 dark:bg-[#081d16] border border-gray-200 dark:border-emerald-900/50 space-y-2 text-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-brand-emerald" /> {r.date}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          r.attendance === "Present"
+                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                            : r.attendance === "Absent"
+                            ? "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
+                            : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                        }`}
+                      >
+                        {r.attendance}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-white dark:bg-[#05130e] p-2.5 rounded-xl border border-gray-100 dark:border-emerald-900/30">
+                      <div>
+                        <span className="text-[10px] text-gray-400 block font-bold">سبق (Sabaq)</span>
+                        <span className="font-semibold text-emerald-700 dark:text-emerald-400">{r.sabaq || "—"}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 block font-bold">سبقی (Sabqi)</span>
+                        <span className="font-semibold">{r.sabqi || "—"}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 block font-bold">منزل (Manzil)</span>
+                        <span className="font-semibold">{r.manzil || "—"}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1">
+                      <span>Tajweed Mistakes: <strong className="text-red-500">{r.tajweedMistakes ?? 0}</strong></span>
+                      <div className="flex items-center gap-1 text-amber-500">
+                        <Star className="w-3 h-3 fill-amber-500" />
+                        <span className="font-bold">{r.rating}/5</span>
+                      </div>
+                    </div>
+                    {r.teacherNotes && (
+                      <p className="text-[11px] italic bg-amber-50/50 dark:bg-amber-950/20 p-2 rounded-lg text-amber-900 dark:text-amber-300">
+                        Teacher: {r.teacherNotes}
+                      </p>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-emerald-900">
+              <button
+                onClick={() => setReportStudent(null)}
+                className="px-4 py-2 rounded-xl bg-brand-deep text-white text-xs font-semibold"
+              >
+                Close Diary
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Course Completion Certificate Modal */}
+      {certificateStudent && (
+        <CertificateModal
+          open={Boolean(certificateStudent)}
+          onClose={() => setCertificateStudent(null)}
+          studentName={certificateStudent.fullName}
+          courseName={certificateStudent.selectedCourse}
+        />
       )}
 
       <ConfirmModal
