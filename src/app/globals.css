@@ -21,8 +21,42 @@
   letter-spacing: normal;
 }
 
-[dir="rtl"] .font-urdu {
+[dir="rtl"] body {
+  line-height: 1.85;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4 {
+  line-height: 1.6;
+}
+
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] a,
+[dir="rtl"] button {
   line-height: 1.8;
+}
+
+[dir="rtl"] .font-urdu {
+  line-height: 2;
+}
+
+/* High Contrast Brand Gold for Light Backgrounds */
+:root:not(.dark) .text-brand-gold {
+  color: #96742a;
+}
+
+/* Mobile Touch Target Standards */
+@media (max-width: 768px) {
+  button, 
+  a.inline-flex, 
+  a.flex,
+  input[type="submit"], 
+  input[type="button"] {
+    min-height: 40px;
+  }
 }
 
 /* Subtle Geometric Star Pattern */

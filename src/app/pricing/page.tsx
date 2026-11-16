@@ -20,6 +20,7 @@ import {
   SupportedCurrency
 } from "@/data/pricing";
 import { PricingCard } from "@/components/PricingCard";
+import { TrustBadges } from "@/components/TrustBadges";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
 import { usePublicData } from "@/components/PublicDataContext";
@@ -86,6 +87,9 @@ export default function PricingPage() {
           )}
         </p>
       </div>
+
+      {/* Trust & Guarantee Badges */}
+      <TrustBadges />
 
       {/* Policies: Family Discount, Payment Methods, Refund, Rescheduling */}
       <section className="bg-white rounded-3xl p-8 sm:p-12 border border-brand-border/80 shadow-sm space-y-8">

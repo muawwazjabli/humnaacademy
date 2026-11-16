@@ -25,6 +25,7 @@ import { CourseCard } from "@/components/CourseCard";
 import { TeacherCard } from "@/components/TeacherCard";
 import { PricingCard } from "@/components/PricingCard";
 import { HeroSlider } from "@/components/HeroSlider";
+import { TrustBadges } from "@/components/TrustBadges";
 import { buildWhatsAppLink, ACADEMY_CONFIG } from "@/lib/constants";
 import { useLanguage } from "@/components/LanguageContext";
 import { usePublicData } from "@/components/PublicDataContext";
@@ -338,6 +339,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Trust & Credibility Badges */}
+      <TrustBadges />
 
       {/* ===================== WHY CHOOSE HUMNA ACADEMY ===================== */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

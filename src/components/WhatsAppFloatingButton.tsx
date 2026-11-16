@@ -45,7 +45,7 @@ export const WhatsAppFloatingButton: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex flex-col items-end">
       {/* Popover Menu */}
       {isOpen && (
         <div className="mb-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden animate-fadeIn transition-all">

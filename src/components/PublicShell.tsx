@@ -6,6 +6,7 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { WhatsAppFloatingButton } from "./WhatsAppFloatingButton";
+import { MobileBottomBar } from "./MobileBottomBar";
 import { usePublicData } from "./PublicDataContext";
 import { ShieldAlert, MessageCircle } from "lucide-react";
 
@@ -47,9 +48,10 @@ export const PublicShell = ({ children }: { children: React.ReactNode }) => {
     <>
       <AnnouncementBar />
       <Navbar />
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow pb-16 md:pb-0">{children}</main>
       <Footer />
       <WhatsAppFloatingButton />
+      <MobileBottomBar />
     </>
   );
 };
