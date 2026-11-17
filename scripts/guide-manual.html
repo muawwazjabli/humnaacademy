@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>ہمنہ اکیڈمی - مکمل گائیڈ بک اور آپریٹنگ مینول</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: counter(page);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 9pt;
+        color: #666;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #1a2e26;
+      background-color: #ffffff;
+      line-height: 2.1;
+      font-size: 11pt;
+    }
+
+    .latin {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .arabic {
+      font-family: 'Amiri', serif;
+      font-size: 13pt;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .no-break {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      min-height: 920px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      padding: 40px 20px;
+      border: 6px double #c5a15a;
+      background: radial-gradient(circle at center, #ffffff 0%, #fbf8f1 100%);
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .cover-header {
+      margin-top: 30px;
+    }
+
+    .cover-logo-badge {
+      display: inline-block;
+      width: 90px;
+      height: 90px;
+      background: #123f32;
+      color: #c5a15a;
+      border-radius: 24px;
+      line-height: 90px;
+      font-size: 38pt;
+      border: 3px solid #c5a15a;
+      box-shadow: 0 10px 25px rgba(18, 63, 50, 0.2);
+    }
+
+    .cover-title {
+      font-size: 28pt;
+      color: #123f32;
+      margin: 25px 0 10px 0;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .cover-subtitle {
+      font-size: 15pt;
+      color: #8c6d2d;
+      margin: 0 0 20px 0;
+      font-weight: 600;
+    }
+
+    .cover-desc {
+      font-size: 11.5pt;
+      color: #4a5d55;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 2.2;
+    }
+
+    .cover-features-box {
+      background: #ffffff;
+      border: 1px solid #e2d7be;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 30px auto;
+      max-width: 520px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      text-align: right;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 11pt;
+    }
+
+    .feature-bullet {
+      width: 10px;
+      height: 10px;
+      background: #16845b;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .cover-footer {
+      border-top: 1px solid #e0d5be;
+      padding-top: 15px;
+      font-size: 10pt;
+      color: #666;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4 {
+      color: #123f32;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 18pt;
+      border-bottom: 2px solid #16845b;
+      padding-bottom: 8px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .h2-number {
+      background: #123f32;
+      color: #c5a15a;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12pt;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    h3 {
+      font-size: 13.5pt;
+      color: #16845b;
+      margin-top: 22px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0 0 12px 0;
+      text-align: justify;
+    }
+
+    /* Boxes & Alerts */
+    .box {
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin: 15px 0;
+      border: 1px solid transparent;
+    }
+
+    .box-info {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #166534;
+    }
+
+    .box-gold {
+      background: #fefce8;
+      border-color: #fef08a;
+      color: #854d0e;
+    }
+
+    .box-tip {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .box-title {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 11.5pt;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 10.5pt;
+    }
+
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      text-align: right;
+    }
+
+    th {
+      background-color: #123f32;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 8px;
+      font-size: 9pt;
+      font-weight: 700;
+    }
+
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+    .badge-blue { background: #e0f2fe; color: #0369a1; }
+
+    /* Code Snippets */
+    .code-box {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: 'Plus Jakarta Sans', monospace;
+      font-size: 9.5pt;
+      direction: ltr;
+      text-align: left;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .url-link {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #16845b;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    /* Step flow */
+    .step-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border-right: 4px solid #16845b;
+    }
+
+    .step-number {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      color: #16845b;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div class="cover-header">
+      <div class="cover-logo-badge">🕌</div>
+      <h1 class="cover-title">ہمنہ آن لائن قرآن اکیڈمی</h1>
+      <div class="cover-subtitle">مکمل یوزر گائیڈ اور ایڈمنسٹریشن آپریٹنگ مینول</div>
+      <p class="cover-desc">
+        ویب سائٹ چلانے، ایڈمن پینل، اسٹوڈنٹ پورٹل، ٹیچر پورٹل، روزانہ سبق ڈائری، حاضری، فیس مینجمنٹ اور سرٹیفکیٹ جاری کرنے کا مکمل اور جامع طریقہ کار۔
+      </p>
+    </div>
+
+    <div class="cover-features-box">
+      <div class="feature-item">
+        <div class="feature-bullet"></div>
+        <span><strong>ایڈمن پینل کنٹرول:</strong> اسٹوڈنٹ اور ٹیچر اکاؤنٹس، کلاس ٹائمنگز اور فیس کا تعین۔</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-bullet"></div>
+        <span><strong>اسٹوڈنٹ پورٹل:</strong> روزانہ کا سبق، سبقی، منزل ڈائری، چھٹی کی درخواست اور ڈیجیٹل ریڈر۔</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-bullet"></div>
+        <span><strong>ٹیچر پورٹل:</strong> روزانہ حاضری، سبق کا اندراج، تجوید کی غلطیاں، اور ریٹنگ۔</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-bullet"></div>
+        <span><strong>اینٹی گریویٹی سیٹ اپ:</strong> نئے کمپیوٹر پر ایک کلک سے پورا پروجیکٹ لائیو کرنے کا طریقہ۔</span>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div>تیار کردہ: ہمنہ اکیڈمی ڈیولپمنٹ اینڈ ٹیکنالوجی ٹیم</div>
+      <div class="latin">Official Operations & Administration Manual • 2026 Edition</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- TABLE OF CONTENTS -->
+  <h2><span class="h2-number">1</span> فہرستِ عنوانات (Table of Contents)</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%;">باب</th>
+        <th style="width: 60%;">عنوان</th>
+        <th style="width: 25%;">سیکشنز</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>باب ۱</strong></td>
+        <td>اکیڈمی پلیٹ فارم کا عمومی تعارف اور آرکیٹیکچر</td>
+        <td>ویب سائٹ، پورٹلز، ڈیٹا بیس</td>
+      </tr>
+      <tr>
+        <td><strong>باب ۲</strong></td>
+        <td>ویب سائٹ میں نام، نمبر اور برانڈنگ تبدیل کرنا</td>
+        <td>لوگو، فون نمبر، واٹس ایپ، بینرز</td>
+      </tr>
+      <tr>
+        <td><strong>باب ۳</strong></td>
+        <td>ایڈمن پینل چلانے کا مکمل طریقہ (Administrator Guide)</td>
+        <td>طلباء کا اندراج، اساتذہ، فیس، سرٹیفکیٹ</td>
+      </tr>
+      <tr>
+        <td><strong>باب ۴</strong></td>
+        <td>اسٹوڈنٹ پورٹل گائیڈ - طلباء اور والدین کے لیے</td>
+        <td>لاگ ان، کلاس ٹائمنگ، سبق ڈائری، رسید</td>
+      </tr>
+      <tr>
+        <td><strong>باب ۵</strong></td>
+        <td>ٹیچر پورٹل گائیڈ - اساتذہ کرام کے لیے</td>
+        <td>طلباء کی لسٹ، حاضری، سبق کا اندراج</td>
+      </tr>
+      <tr>
+        <td><strong>باب ۶</strong></td>
+        <td>نئے کمپیوٹر پر اینٹی گریویٹی کے ذریعے ڈپلائی کرنا</td>
+        <td>ورسل، گٹ ہب، فائر بیس کنکشن</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 1 -->
+  <h2><span class="h2-number">2</span> اکیڈمی پلیٹ فارم کا تعارف اور ساخت</h2>
+  <p>
+    ہمنہ اکیڈمی کا پلیٹ فارم جدید ترین ویب ٹیکنالوجی پر تیار کیا گیا ہے تاکہ آن لائن قرآن مجید، ناظرہ، حفظ اور تجوید کی تعلیم کو منظم، شفاف اور بین الاقوامی معیار کے مطابق بنایا جا سکے۔
+  </p>
+
+  <div class="box box-info">
+    <div class="box-title">🌟 پلیٹ فارم کے 4 بنیادی ستون:</div>
+    <ul>
+      <li><strong>پبلک ویب سائٹ:</strong> کورسز، اساتذہ کے آڈیو سیمپلز، پرائسنگ، ٹرسٹ بیجز، اور 3-مرحلہ ٹرائل فارم۔</li>
+      <li><strong>سپر ایڈمن پینل:</strong> اکیڈمی کی تمام انتظامی کارروائی، طلباء اور اساتذہ کا اندراج، اور مالیاتی ریکارڈ۔</li>
+      <li><strong>اسٹوڈنٹ پورٹل:</strong> طالب علم اور والدین کے لیے روزانہ کی کلاس ٹائمنگز، سبق ڈائری اور فیس کی تفصیل۔</li>
+      <li><strong>ٹیچر پورٹل:</strong> اساتذہ کے لیے کلاس حاضری، روزانہ کے سبق کا اندراج اور کلاسروم ریڈر۔</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="page-break"></div>
+  <h2><span class="h2-number">3</span> اکیڈمی کی معلومات اور برانڈنگ تبدیل کرنے کا طریقہ</h2>
+  <p>
+    اگر آپ یا آپ کا طالب علم اس ویب سائٹ کو اپنی کسی دوسری اکیڈمی کے لیے استعمال کرنا چاہتے ہیں، تو تمام بنیادی تبدیلیاں دو آسان طریقوں سے کی جا سکتی ہیں:
+  </p>
+
+  <h3>طریقہ نمبر ۱: ایڈمن پینل سے (بغیر کسی کوڈنگ کے)</h3>
+  <div class="step-card">
+    <span class="step-number">01</span> ایڈمن پینل <span class="url-link">/admin/website-settings</span> پر لاگ ان ہو کر جائیں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">02</span> <strong>Academy Name:</strong> یہاں اپنی اکیڈمی کا نیا نام لکھیں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">03</span> <strong>WhatsApp & Phone:</strong> اپنا رابطہ اور واٹس ایپ نمبر درج کریں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">04</span> <strong>"Save Settings"</strong> کا بٹن دبائیں۔ ویب سائٹ پر ہر جگہ آپ کی نئی معلومات فوری لائیو ہو جائیں گی۔
+  </div>
+
+  <h3>طریقہ نمبر ۲: فائلز تبدیل کر کے (لوگو اور بینرز)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>چیز</th>
+        <th>فائل کا پتہ (File Path)</th>
+        <th>طریقہ کار</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>اکیڈمی کا لوگو</strong></td>
+        <td class="latin">public/logo.jpg</td>
+        <td>اپنی اکیڈمی کا لوگو اس فائل کی جگہ رکھ دیں۔</td>
+      </tr>
+      <tr>
+        <td><strong>ہوم پیج بینرز</strong></td>
+        <td class="latin">public/1.jpg, 2.jpg, 3.jpg, 4.jpg</td>
+        <td>اپنے ڈیزائن کیے ہوئے 4 بینرز اسی نام سے رکھ دیں۔</td>
+      </tr>
+      <tr>
+        <td><strong>مرکزی کنفگریشن</strong></td>
+        <td class="latin">src/lib/constants.ts</td>
+        <td>فائل میں موجود <span class="latin">ACADEMY_CONFIG</span> میں نام اور نمبر ایڈٹ کریں۔</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 3 -->
+  <div class="page-break"></div>
+  <h2><span class="h2-number">4</span> ایڈمن پینل چلانے کا مکمل طریقہ (Administrator Guide)</h2>
+  <p>
+    ایڈمن پینل کا لنک: <span class="url-link">https://humnaacademy.com/admin</span> ہے، جہاں سپر ایڈمن اپنے ای میل اور پاسورڈ کے ذریعے لاگ ان ہو سکتے ہیں۔
+  </p>
+
+  <h3>۱. نیا طالب علم شامل کرنا (Add Student)</h3>
+  <p>
+    ایڈمن سائیڈبار میں <strong>"Students"</strong> پر کلک کریں اور <strong>"+ Add New Student"</strong> کا بٹن دبائیں۔ درج ذیل اہم خانے پر کریں:
+  </p>
+  <ul>
+    <li><strong>Student Full Name:</strong> طالب علم کا نام۔</li>
+    <li><strong>WhatsApp Number:</strong> والدین کا واٹس ایپ نمبر (ملکی کوڈ کے ساتھ)۔</li>
+    <li><strong>Country & Time Zone:</strong> طالب علم کا ملک اور اس کا مقامی ٹائم زون۔</li>
+    <li><strong>Selected Course & Assigned Teacher:</strong> منتخب کورس اور استاد کا انتخاب۔</li>
+    <li><strong>Class Schedule (کلاس شیڈول):</strong>
+      <ul>
+        <li>کلاس کا وقت (مثلاً: <span class="latin">05:00 PM PKT</span>)</li>
+        <li>کلاس کے دن (مثلاً: <span class="latin">Mon, Wed, Fri</span>)</li>
+        <li>دورانیہ (30، 45 یا 60 منٹ)</li>
+        <li>لائیو کلاس لنک (Zoom یا Google Meet کا مستقل میٹنگ لنک)</li>
+      </ul>
+    </li>
+    <li><strong>Monthly Fee (ماہانہ فیس):</strong> کرنسی (USD, GBP, PKR) اور رقم درج کریں۔</li>
+    <li><strong>Portal Login (پورٹل لاگ ان):</strong>
+      <strong>"Generate Credentials"</strong> پر کلک کریں، سسٹم خودکار طریقے سے یوزرنیم اور مضبوط پاسورڈ بنا دے گا۔ پھر <strong>"Copy for Student"</strong> پر کلک کر کے یہ معلومات والدین کو واٹس ایپ کر دیں۔
+    </li>
+  </ul>
+
+  <h3>۲. نیا استاد شامل کرنا (Add Teacher)</h3>
+  <p>
+    ایڈمن سائیڈبار میں <strong>"Teachers"</strong> پر جائیں اور <strong>"+ Add New Teacher"</strong> پر کلک کریں۔ استاد کا نام، تصویر، تعلیمی اسناد، تدریسی تجربہ اور زبانیں درج کریں۔ نیچے <strong>Teacher Portal Login</strong> میں استاد کے لیے یوزرنیم اور پاسورڈ سیٹ کر کے استاد کو فراہم کریں۔
+  </p>
+
+  <h3>۳. طالب علم کی ڈائری اور سرٹیفکیٹ جاری کرنا</h3>
+  <p>
+    سٹوڈنٹس لسٹ میں ہر طالب علم کے آگے دو خصوصی بٹن دیے گئے ہیں:
+  </p>
+  <ul>
+    <li>📖 <strong>Sabaq Diary بٹن:</strong> اس پر کلک کر کے آپ دیکھ سکتے ہیں کہ استاد نے روزانہ بچے کو کیا سبق دیا، کتنی غلطیاں ہوئیں اور کیا ریمارکس دیے۔</li>
+    <li>🎓 <strong>Certificate بٹن:</strong> کورس مکمل ہونے پر ایک کلک سے باضابطہ ہمنہ اکیڈمی کا سرٹیفکیٹ پرنٹ یا پی ڈی ایف سیو کریں۔</li>
+  </ul>
+
+  <!-- SECTION 4 -->
+  <div class="page-break"></div>
+  <h2><span class="h2-number">5</span> اسٹوڈنٹ پورٹل گائیڈ - طلباء اور والدین کے لیے</h2>
+  <p>
+    طالب علم اور والدین کے لیے پورٹل لاگ ان لنک: <span class="url-link">https://humnaacademy.com/portal/student</span> ہے جہاں وہ ایڈمن کی طرف سے فراہم کردہ یوزرنیم اور پاسورڈ کے ذریعے داخل ہو سکتے ہیں۔
+  </p>
+
+  <div class="box box-gold">
+    <div class="box-title">📱 اسٹوڈنٹ پورٹل کے 4 اہم شعبے:</div>
+  </div>
+
+  <h3>۱. کلاس شیڈول اور لائیو کلاس جوائن کرنا (Overview & Schedule)</h3>
+  <p>
+    لاگ ان ہوتے ہی سٹوڈنٹ کو اس کے استاد کا نام، کلاس کا وقت اور دن نظر آتے ہیں۔ اوپر نمایاں سبز بٹن <strong>"Join Live Class"</strong> موجود ہے جس پر کلک کرتے ہی طالب علم براہ راست زوم یا گوگل میٹ کلاس میں شامل ہو جاتا ہے۔
+  </p>
+
+  <h3>۲. روزانہ کا سبق اور پروگریس ڈائری (Daily Sabaq Diary)</h3>
+  <p>
+    اس ٹیب میں والدین اپنے بچے کی روزانہ کی مکمل تعلیمی کارکردگی دیکھ سکتے ہیں:
+  </p>
+  <ul>
+    <li><strong>حاضری (Attendance):</strong> کلاس میں حاضر، غیر حاضر، یا رخصت۔</li>
+    <li><strong>سبق (Sabaq):</strong> آج کا نیا سبق (پارہ، سورت اور آیات)۔</li>
+    <li><strong>سبقی (Sabqi):</strong> دہرائی کا سبق۔</li>
+    <li><strong>منزل (Manzil):</strong> پچھلا یاد کیا ہوا حفظ۔</li>
+    <li><strong>تجوید کی غلطیاں:</strong> تلفظ اور مخارج کی درستگی۔</li>
+    <li><strong>اسٹار ریٹنگ (Rating):</strong> استاد کی طرف سے 1 سے 5 اسٹارز اور خصوصی حوصلہ افزا نوٹس۔</li>
+  </ul>
+
+  <h3>۳. چھٹی اور وقت تبدیل کرنے کی درخواست (Leave & Reschedule)</h3>
+  <p>
+    اگر بچہ سفر پر ہے یا بیمار ہے، تو اوپر موجود <strong>"Request Leave / Reschedule"</strong> بٹن دبا کر چھٹی کی تاریخ، وجہ اور نیا متبادل وقت لکھ کر آن لائن درخواست جمع کروا سکتے ہیں، جو فوری طور پر استاد کو موصول ہو جاتی ہے۔
+  </p>
+
+  <h3>۴. فیس انوائس اور رسید اپلوڈ (Tuition & Fees)</h3>
+  <p>
+    اس ٹیب میں ہر ماہ کی فیس کا بل نظر آتا ہے۔ بینک ٹرانسفر کے بعد والدین <strong>"Upload Payment Receipt"</strong> پر کلک کر کے بینک ٹرانزیکشن کی رسید یا اسکرین شاٹ اپلوڈ کر سکتے ہیں۔
+  </p>
+
+  <h3>۵. آن اسکرین قرآنی و قعدہ ریڈر (Digital Reader)</h3>
+  <p>
+    پورٹل کے اندر ہی انٹرایکٹو نورانی قاعدہ (اسباق 1 تا 8) اور قرآن مجید عثمانی رسم الخط اور اردو ترجمہ کے ساتھ موجود ہے تاکہ سٹوڈنٹ پورٹل کے اندر ہی پریکٹس کر سکے۔
+  </p>
+
+  <!-- SECTION 5 -->
+  <div class="page-break"></div>
+  <h2><span class="h2-number">6</span> ٹیچر پورٹل گائیڈ - اساتذہ کرام کے لیے</h2>
+  <p>
+    اساتذہ کے لیے لاگ ان پورٹل: <span class="url-link">https://humnaacademy.com/portal/teacher</span> ہے۔ لاگ ان ہونے کے بعد استاد کو اپنا ڈیش بورڈ نظر آتا ہے۔
+  </p>
+
+  <h3>۱. زیرِ تعلیم طلباء کی فہرست اور اوقات</h3>
+  <p>
+    ڈیش بورڈ پر استاد کو صرف وہی طلباء نظر آتے ہیں جو ایڈمن نے ان کے ساتھ وابستہ کیے ہیں۔ ہر بچے کا نام، کلاس ٹائمنگ اور کورس سامنے واضح ہوتا ہے۔
+  </p>
+
+  <h3>۲. روزانہ کی حاضری اور سبق درج کرنا (Record Daily Sabaq)</h3>
+  <div class="step-card">
+    <span class="step-number">01</span> طالب علم کے نام کے سامنے <strong>"Record Sabaq & Attendance"</strong> پر کلک کریں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">02</span> حاضری منتخب کریں: <span class="badge badge-green">Present</span> یا <span class="badge badge-amber">Absent</span> یا <span class="badge badge-blue">Leave</span>۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">03</span> نیا سبق (Sabaq)، سبقی (Sabqi) اور منزل (Manzil) درج کریں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">04</span> تجوید کی غلطیوں کی تعداد لکھیں اور بچے کی کارکردگی پر اسٹار ریٹنگ (1 تا 5) اور نوٹس دیں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">05</span> <strong>"Save Daily Report"</strong> دبائیں۔ یہ رپورٹ فوری طور پر طالب علم اور والدین کے پورٹل پر پہنچ جائے گی۔
+  </div>
+
+  <h3>۳. چھٹی کی درخواستوں کی منظوری (Approve Leave)</h3>
+  <p>
+    اگر کسی طالب علم نے چھٹی کی درخواست دی ہو تو استاد کے ڈیش بورڈ پر درخواست نمایاں ہو جاتی ہے۔ استاد اپنی سہولت دیکھ کر <strong>"Approve"</strong> یا <strong>"Reject"</strong> کر سکتے ہیں۔
+  </p>
+
+  <h3>۴. کلاسروم ریڈر اور اسکرین شیئر</h3>
+  <p>
+    اوپر <strong>"Classroom Reader"</strong> کا بٹن آن کرنے پر پورا قرآن مجید اور قاعدہ کھل جاتا ہے جسے زوم پر اسکرین شیئر کر کے باآسانی پڑھایا جا سکتا ہے۔
+  </p>
+
+  <!-- SECTION 6 -->
+  <div class="page-break"></div>
+  <h2><span class="h2-number">7</span> اینٹی گریویٹی کے ذریعے نئے کمپیوٹر پر ڈپلائی کرنا</h2>
+  <p>
+    اگر آپ کا طالب علم اپنے کمپیوٹر پر یہ پورا پروجیکٹ اپنی اکیڈمی کے لیے لائیو کرنا چاہتا ہے، تو وہ درج ذیل 3 مراحل پر عمل کرے گا:
+  </p>
+
+  <div class="step-card">
+    <span class="step-number">مرحلہ ۱</span> <strong>زپ فائل ان زپ کریں:</strong> <span class="latin">humna-academy-website-complete.zip</span> کو کسی بھی فولڈر میں ایکسٹریکٹ کریں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">مرحلہ ۲</span> <strong>اینٹی گریویٹی میں اوپن کریں:</strong> اینٹی گریویٹی میں جا کر <span class="latin">Open Folder</span> سے وہ فولڈر کھولیں۔
+  </div>
+  <div class="step-card">
+    <span class="step-number">مرحلہ ۳</span> <strong>اینٹی گریویٹی کو پرامپٹ دیں:</strong> اینٹی گریویٹی کی چیٹ میں درج ذیل جادوئی پرامپٹ پیسٹ کریں:
+  </div>
+
+  <div class="code-box">
+"یہ میری آن لائن قرآن اکیڈمی کا مکمل پروجیکٹ ہے۔ برائے مہربانی اس کو میرے GitHub، 
+Firebase اور Vercel کے ساتھ منسلک کر کے لائیو ڈپلائی کر دو۔ اکیڈمی کا نام [My Academy Name] 
+اور واٹس ایپ نمبر [My Number] تبدیل کر دو اور سپر ایڈمن کا پاسورڈ سیٹ کر کے مجھے دے دو۔"
+  </div>
+
+  <div class="box box-info">
+    <div class="box-title">✅ اینٹی گریویٹی خودکار طریقے سے کیا کرے گا؟</div>
+    <ol>
+      <li>پروجیکٹ کی تمام فائلوں اور <span class="latin">SETUP_GUIDE_FOR_STUDENT.md</span> کو پڑھے گا۔</li>
+      <li>فائر بیس میں فائر اسٹور رولز اور ڈیٹابیس کنفیگر کرے گا۔</li>
+      <li>کورسز، فیس اور بلاگز کا ابتدائی ڈیٹا خودکار سیڈ (Seed) کرے گا۔</li>
+      <li>ورسل پر پروجیکٹ کنیکٹ کر کے تمام انوائرنمنٹ ویری ایبلز ڈالے گا اور سائٹ کو لائیو ڈپلائی کر دے گا۔</li>
+    </ol>
+  </div>
+
+  <div style="text-align: center; margin-top: 50px; padding: 25px; border-top: 2px solid #e2e8f0;">
+    <div style="font-size: 16pt; font-weight: 700; color: #123f32;">ہمنہ آن لائن اکیڈمی - ٹیکنالوجی ڈویژن</div>
+    <div style="font-size: 10pt; color: #666; margin-top: 5px;">
+      اگر آپ کو کسی قسم کی رہنمائی درکار ہو تو ہمارے ٹیکنیکل سپورٹ واٹس ایپ پر رابطہ کریں۔
+    </div>
+    <div class="latin" style="margin-top: 8px; font-weight: 700; color: #16845b;">
+      support@humnaacademy.com • WhatsApp: +92 301 7291844
+    </div>
+  </div>
+
+</body>
+</html>
